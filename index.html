@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>IELTS Route</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+:root{
+  --ink:#1B2A4A;
+  --ink-soft:#4A5A78;
+  --paper:#EEF1EC;
+  --card:#FFFFFF;
+  --gold:#B8873A;
+  --gold-soft:#E9D9B8;
+  --teal:#3C7A6E;
+  --teal-soft:#D9E8E4;
+  --red:#B4483C;
+  --line:#D8DCD3;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'Inter',sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:'Fraunces',serif;margin:0;letter-spacing:-0.01em;}
+.mono{font-family:'IBM Plex Mono',monospace;}
+.wrap{max-width:980px;margin:0 auto;padding:28px 20px 80px;}
+
+/* header */
+header.top{
+  display:flex;justify-content:space-between;align-items:flex-end;
+  border-bottom:2px solid var(--ink);
+  padding-bottom:16px;margin-bottom:28px;
+}
+.brand{display:flex;align-items:baseline;gap:10px;}
+.brand h1{font-size:26px;font-weight:600;}
+.brand .stamp{
+  font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--gold);
+  border:1px solid var(--gold);border-radius:3px;padding:2px 6px;letter-spacing:.06em;
+}
+.target-pill{
+  font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--ink-soft);
+  text-align:right;
+}
+.target-pill b{color:var(--ink);font-size:16px;}
+
+/* tabs */
+nav.tabs{display:flex;gap:6px;margin-bottom:24px;flex-wrap:wrap;}
+nav.tabs button{
+  font-family:'Inter',sans-serif;font-size:14px;font-weight:600;
+  background:transparent;border:1.5px solid var(--line);color:var(--ink-soft);
+  padding:9px 16px;border-radius:20px;cursor:pointer;transition:.15s;
+}
+nav.tabs button:hover{border-color:var(--ink);color:var(--ink);}
+nav.tabs button.active{background:var(--ink);border-color:var(--ink);color:var(--paper);}
+
+.view{display:none;}
+.view.active{display:block;}
+
+/* route map */
+.route-card{
+  background:var(--ink);color:var(--paper);border-radius:14px;
+  padding:26px 24px 20px;margin-bottom:24px;
+}
+.route-card h2{color:#fff;font-size:19px;margin-bottom:2px;}
+.route-sub{color:#9FB0C9;font-size:13px;margin-bottom:18px;}
+.route-row{display:flex;align-items:center;gap:14px;margin-bottom:16px;}
+.route-row:last-child{margin-bottom:0;}
+.route-label{width:88px;font-size:12.5px;font-weight:600;color:#C8D3E4;flex-shrink:0;}
+.route-track{position:relative;flex:1;height:26px;}
+.route-line{position:absolute;top:12px;left:0;right:0;height:2px;background:#3A4D70;}
+.route-checks{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;}
+.route-checks span{
+  width:2px;height:26px;position:relative;
+}
+.route-checks span::after{
+  content:attr(data-b);position:absolute;top:-16px;left:50%;transform:translateX(-50%);
+  font-family:'IBM Plex Mono',monospace;font-size:9px;color:#6B7FA0;
+}
+.route-checks span::before{
+  content:'';position:absolute;top:9px;left:0;width:2px;height:8px;background:#3A4D70;
+}
+.route-marker{
+  position:absolute;top:2px;width:22px;height:22px;border-radius:50%;
+  background:var(--gold);border:3px solid var(--ink);
+  transform:translateX(-50%);transition:left .5s ease;
+  box-shadow:0 0 0 2px var(--gold);
+}
+.route-target{
+  position:absolute;top:6px;width:14px;height:14px;transform:translateX(-50%) rotate(45deg);
+  background:var(--teal);border:2px solid var(--ink);
+}
+
+/* dashboard cards */
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+@media(max-width:720px){.grid4{grid-template-columns:repeat(2,1fr);}}
+.skill-card{
+  background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;
+}
+.skill-card .sname{font-size:12.5px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em;}
+.skill-card .sband{font-family:'Fraunces',serif;font-size:34px;font-weight:600;margin:4px 0 2px;}
+.skill-card .scount{font-size:11.5px;color:var(--ink-soft);}
+
+.stats-row{display:flex;gap:14px;margin-bottom:24px;flex-wrap:wrap;}
+.stat-box{
+  flex:1;min-width:140px;background:var(--card);border:1px solid var(--line);
+  border-radius:12px;padding:16px;
+}
+.stat-box .slabel{font-size:11.5px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em;}
+.stat-box .sval{font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:600;margin-top:4px;}
+
+.history-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;}
+.history-card h3{font-size:16px;margin-bottom:14px;}
+.bars{display:flex;align-items:flex-end;gap:8px;height:120px;}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;}
+.bar-fill{width:100%;border-radius:4px 4px 0 0;background:var(--teal);min-height:3px;}
+.bar-date{font-size:9.5px;color:var(--ink-soft);font-family:'IBM Plex Mono',monospace;}
+.empty-note{color:var(--ink-soft);font-size:13.5px;padding:20px 0;text-align:center;}
+
+/* practice */
+.practice-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:22px;margin-bottom:18px;}
+.practice-card h3{font-size:18px;margin-bottom:6px;}
+.tag{
+  display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:10.5px;
+  background:var(--gold-soft);color:#7A5A20;padding:2px 8px;border-radius:10px;margin-bottom:10px;
+}
+.passage{background:var(--paper);border-radius:8px;padding:14px 16px;font-size:14.5px;line-height:1.6;margin:12px 0;white-space:pre-line;}
+.gap-input{
+  width:auto;min-width:160px;display:inline-block;border:1.5px solid var(--line);
+  border-radius:6px;padding:6px 10px;font-size:14px;font-family:'Inter',sans-serif;
+}
+.gap-input.correct{border-color:var(--teal);background:var(--teal-soft);}
+.gap-input.wrong{border-color:var(--red);background:#F5E2DF;}
+.q-block{margin:16px 0;}
+.q-block p{font-weight:600;font-size:14.5px;margin-bottom:8px;}
+.q-opt{
+  display:block;width:100%;text-align:left;background:var(--card);border:1.5px solid var(--line);
+  border-radius:8px;padding:9px 12px;margin-bottom:6px;cursor:pointer;font-size:14px;font-family:'Inter',sans-serif;
+  transition:.12s;
+}
+.q-opt:hover{border-color:var(--ink-soft);}
+.q-opt.selected{border-color:var(--ink);background:var(--paper);font-weight:600;}
+.q-opt.correct{border-color:var(--teal);background:var(--teal-soft);}
+.q-opt.wrong{border-color:var(--red);background:#F5E2DF;}
+
+.btn{
+  font-family:'Inter',sans-serif;font-weight:600;font-size:14px;
+  background:var(--ink);color:#fff;border:none;border-radius:8px;
+  padding:11px 20px;cursor:pointer;transition:.15s;
+}
+.btn:hover{background:#111D38;}
+.btn.secondary{background:transparent;color:var(--ink);border:1.5px solid var(--ink);}
+.btn:disabled{opacity:.45;cursor:not-allowed;}
+.btn-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:14px;}
+
+select, textarea{
+  width:100%;font-family:'Inter',sans-serif;font-size:14px;border:1.5px solid var(--line);
+  border-radius:8px;padding:10px 12px;background:var(--card);color:var(--ink);
+}
+textarea{min-height:180px;resize:vertical;line-height:1.55;}
+.wordcount{font-size:12px;color:var(--ink-soft);margin-top:6px;font-family:'IBM Plex Mono',monospace;}
+
+.feedback-box{
+  background:var(--paper);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;
+  padding:16px 18px;margin-top:16px;font-size:14px;line-height:1.6;
+}
+.feedback-box .fband{font-family:'Fraunces',serif;font-size:26px;font-weight:600;color:var(--ink);}
+.feedback-box h4{font-size:12.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-soft);margin:12px 0 4px;}
+.loading{color:var(--ink-soft);font-size:13.5px;font-style:italic;}
+.result-line{font-size:13.5px;margin-top:10px;font-weight:600;}
+
+/* auth */
+.auth-overlay{
+  position:fixed;inset:0;background:var(--paper);z-index:1000;
+  display:flex;align-items:center;justify-content:center;padding:20px;
+}
+.auth-card{
+  background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:32px;width:100%;max-width:360px;
+}
+.auth-card h2{font-size:22px;margin-bottom:4px;}
+.auth-sub{color:var(--ink-soft);font-size:13.5px;margin-bottom:20px;}
+.auth-card input{
+  width:100%;font-family:'Inter',sans-serif;font-size:14px;border:1.5px solid var(--line);
+  border-radius:8px;padding:10px 12px;background:var(--card);color:var(--ink);margin-bottom:10px;
+}
+.auth-switch{font-size:13px;color:var(--ink-soft);margin-top:14px;text-align:center;}
+.auth-switch a{color:var(--teal);cursor:pointer;font-weight:600;}
+.auth-msg{font-size:13px;margin-top:10px;}
+.auth-msg.error{color:var(--red);}
+.auth-msg.ok{color:var(--teal);}
+.hidden{display:none !important;}
+.logout-btn{
+  font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);
+  background:transparent;border:1px solid var(--line);border-radius:14px;
+  padding:4px 10px;cursor:pointer;margin-top:6px;
+}
+.logout-btn:hover{border-color:var(--ink);color:var(--ink);}
+</style>
+</head>
+<body>
+
+<div id="authOverlay" class="auth-overlay">
+  <div class="auth-card">
+    <h2 id="authTitle">Вход</h2>
+    <div class="auth-sub" id="authSub">Войдите, чтобы синхронизировать прогресс между устройствами.</div>
+    <input type="email" id="authEmail" placeholder="Email" autocomplete="username">
+    <input type="password" id="authPassword" placeholder="Пароль" autocomplete="current-password">
+    <div class="btn-row" style="margin-top:4px;">
+      <button class="btn" id="authSubmit" style="width:100%;justify-content:center;">Войти</button>
+    </div>
+    <div class="auth-msg" id="authMsg"></div>
+    <div class="auth-switch" id="authSwitch">Нет аккаунта? <a onclick="setAuthMode('signup')">Зарегистрироваться</a></div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">
+      <h1>IELTS Route</h1>
+      <span class="stamp">TARGET 6.0–6.5</span>
+    </div>
+    <div class="target-pill">Прогресс к цели<br><b id="overallBandTop">—</b><br><button class="logout-btn" onclick="signOut()">Выйти</button></div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-view="dashboard">Дашборд</button>
+    <button class="tab-btn" data-view="plan">План на месяц</button>
+    <button class="tab-btn" data-view="listening">Listening</button>
+    <button class="tab-btn" data-view="reading">Reading</button>
+    <button class="tab-btn" data-view="writing">Writing</button>
+    <button class="tab-btn" data-view="speaking">Speaking</button>
+    <button class="tab-btn" data-view="vocab">Словарь</button>
+  </nav>
+
+  <!-- DASHBOARD -->
+  <div class="view active" id="view-dashboard">
+    <div class="route-card">
+      <h2>Маршрут до цели</h2>
+      <div class="route-sub">Ваша текущая позиция по каждому навыку · золотая точка = вы, ромб = цель 6.5</div>
+      <div id="routeRows"></div>
+    </div>
+
+    <div class="grid4" id="skillCards"></div>
+
+    <div class="stats-row">
+      <div class="stat-box"><div class="slabel">Сессий пройдено</div><div class="sval mono" id="statSessions">0</div></div>
+      <div class="stat-box"><div class="slabel">Дней подряд</div><div class="sval mono" id="statStreak">0</div></div>
+      <div class="stat-box"><div class="slabel">Средний балл</div><div class="sval mono" id="statAvg">—</div></div>
+    </div>
+
+    <div class="history-card">
+      <h3>История последних сессий</h3>
+      <div id="historyChart"><div class="empty-note">Пока нет данных — начните практику в любом разделе.</div></div>
+    </div>
+  </div>
+
+  <!-- PLAN -->
+  <div class="view" id="view-plan">
+    <div class="route-card" style="margin-bottom:18px;">
+      <h2>30 дней до 6.0–6.5</h2>
+      <div class="route-sub">Каждый день — конкретная задача и ссылка на официальный тест British Council / IDP. Отмечайте выполнение — это попадёт в вашу статистику и streak.</div>
+      <div style="display:flex;gap:22px;margin-top:14px;flex-wrap:wrap;">
+        <div><span class="mono" style="font-size:22px;font-weight:600;" id="planDoneCount">0</span><span style="color:#9FB0C9;font-size:12.5px;"> / 30 дней выполнено</span></div>
+      </div>
+    </div>
+    <div id="planWeeks"></div>
+    <div class="practice-card" style="margin-top:4px;">
+      <h3 style="font-size:15px;">Официальные источники плана</h3>
+      <p style="font-size:13.5px;line-height:1.6;color:var(--ink-soft);">
+        Все ссылки на реальные тесты в плане ведут на официальные страницы бесплатной подготовки от партнёров IELTS —
+        <a href="https://takeielts.britishcouncil.org/take-ielts/prepare/free-ielts-english-practice-tests" target="_blank">British Council</a>,
+        <a href="https://ielts.idp.com/prepare/article-free-practice-tests" target="_blank">IDP</a> и
+        <a href="https://ielts.idp.com/about/ielts-familiarisation-tests" target="_blank">IDP Familiarisation Test</a> (полный тест в формате настоящего компьютерного IELTS, с ответами).
+        Тренажёры Listening/Reading/Writing/Speaking на этой платформе — авторские упражнения того же уровня и формата, для ежедневной отработки между полными тестами.
+      </p>
+    </div>
+  </div>
+
+  <!-- LISTENING -->
+  <div class="view" id="view-listening">
+    <div class="practice-card">
+      <span class="tag" id="lTag">LISTENING · beginner</span>
+      <h3 id="lTitle">—</h3>
+      <select id="lPick" style="margin-bottom:12px;"></select>
+      <div class="btn-row">
+        <button class="btn secondary" onclick="speakScript()">🔊 Прослушать текст</button>
+      </div>
+      <div id="lQuestions"></div>
+      <div class="btn-row">
+        <button class="btn" id="lSubmit" onclick="submitListening()">Проверить ответы</button>
+      </div>
+      <div id="lResult"></div>
+    </div>
+  </div>
+
+  <!-- READING -->
+  <div class="view" id="view-reading">
+    <div class="practice-card">
+      <span class="tag" id="rTag">READING · beginner</span>
+      <h3 id="rTitle">—</h3>
+      <select id="rPick" style="margin-bottom:12px;"></select>
+      <div class="passage" id="rPassage"></div>
+      <div id="rQuestions"></div>
+      <div class="btn-row">
+        <button class="btn" id="rSubmit" onclick="submitReading()">Проверить ответы</button>
+      </div>
+      <div id="rResult"></div>
+    </div>
+  </div>
+
+  <!-- WRITING -->
+  <div class="view" id="view-writing">
+    <div class="practice-card">
+      <span class="tag" id="wTag">WRITING</span>
+      <div class="btn-row" style="margin-top:0;margin-bottom:12px;">
+        <button class="btn secondary" id="wTab1" onclick="setWriteMode(1)">Task 1 (отчёт по данным)</button>
+        <button class="btn secondary" id="wTab2" onclick="setWriteMode(2)">Task 2 (эссе)</button>
+      </div>
+      <h3>Выберите тему</h3>
+      <select id="wPrompt"></select>
+      <div id="wData" class="passage" style="display:none;"></div>
+      <textarea id="wText" placeholder="Начните писать здесь..."></textarea>
+      <div class="wordcount"><span id="wCount">0</span> слов</div>
+      <div class="btn-row">
+        <button class="btn" id="wSubmit" onclick="submitWriting()">Получить оценку от AI</button>
+      </div>
+      <div id="wResult"></div>
+    </div>
+  </div>
+
+  <!-- SPEAKING -->
+  <div class="view" id="view-speaking">
+    <div class="practice-card">
+      <span class="tag" id="sTag">SPEAKING PART 1</span>
+      <div class="btn-row" style="margin-top:0;margin-bottom:12px;">
+        <button class="btn secondary" id="sTab1" onclick="setSpeakMode(1)">Part 1 (вопросы о себе)</button>
+        <button class="btn secondary" id="sTab2" onclick="setSpeakMode(2)">Part 2 (cue card, 2 мин)</button>
+      </div>
+      <h3>Выберите вопрос</h3>
+      <select id="sPrompt"></select>
+      <div id="sCue" class="passage" style="display:none;"></div>
+      <textarea id="sText" placeholder="Напишите, что бы вы ответили устно на этот вопрос (как будто говорите)..."></textarea>
+      <div class="wordcount"><span id="sCount">0</span> слов</div>
+      <div class="btn-row">
+        <button class="btn" id="sSubmit" onclick="submitSpeaking()">Получить оценку от AI</button>
+      </div>
+      <div id="sResult"></div>
+    </div>
+  </div>
+
+  <!-- VOCAB -->
+  <div class="view" id="view-vocab">
+    <div class="practice-card">
+      <span class="tag">VOCABULARY · открытый словарь</span>
+      <h3>Словарь-тренажёр</h3>
+      <p style="font-size:13.5px;color:var(--ink-soft);line-height:1.6;">
+        Введите любое английское слово — получите определение, транскрипцию, произношение и пример.
+        Сохраняйте слова в личный список, чтобы повторять. Данные из открытого словаря (Wiktionary / public domain).
+      </p>
+      <div class="btn-row" style="margin-top:8px;">
+        <input type="text" id="vWord" class="gap-input" placeholder="например: environment" style="min-width:220px;" onkeydown="if(event.key==='Enter')lookupWord()">
+        <button class="btn" onclick="lookupWord()">Найти</button>
+      </div>
+      <div id="vResult" style="margin-top:16px;"></div>
+    </div>
+    <div class="practice-card">
+      <h3 style="font-size:16px;">Мои слова <span class="mono" style="font-size:13px;color:var(--ink-soft);" id="vCount"></span></h3>
+      <div id="vSaved"></div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script>
+/* ---------- Supabase config — замени на значения из своего проекта (Settings → API) ---------- */
+const SUPABASE_URL = 'https://YOUR-PROJECT.supabase.co';
+const SUPABASE_ANON_KEY = 'YOUR-ANON-PUBLIC-KEY';
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let currentUser = null;
+let authMode = 'signin';
+
+function setAuthMode(mode){
+  authMode = mode;
+  const title = document.getElementById('authTitle');
+  const sub = document.getElementById('authSub');
+  const submit = document.getElementById('authSubmit');
+  const switchEl = document.getElementById('authSwitch');
+  document.getElementById('authMsg').textContent = '';
+  if(mode === 'signup'){
+    title.textContent = 'Регистрация';
+    sub.textContent = 'Создайте аккаунт, чтобы прогресс сохранялся и синхронизировался между устройствами.';
+    submit.textContent = 'Зарегистрироваться';
+    switchEl.innerHTML = 'Уже есть аккаунт? <a onclick="setAuthMode(\'signin\')">Войти</a>';
+  } else {
+    title.textContent = 'Вход';
+    sub.textContent = 'Войдите, чтобы синхронизировать прогресс между устройствами.';
+    submit.textContent = 'Войти';
+    switchEl.innerHTML = 'Нет аккаунта? <a onclick="setAuthMode(\'signup\')">Зарегистрироваться</a>';
+  }
+};
+
+document.getElementById('authSubmit').addEventListener('click', async ()=>{
+  const email = document.getElementById('authEmail').value.trim();
+  const password = document.getElementById('authPassword').value;
+  const msgEl = document.getElementById('authMsg');
+  msgEl.className = 'auth-msg';
+  if(!email || !password){ msgEl.textContent = 'Заполните email и пароль.'; msgEl.classList.add('error'); return; }
+  document.getElementById('authSubmit').disabled = true;
+  try{
+    if(authMode === 'signup'){
+      const { error } = await sb.auth.signUp({ email, password });
+      if(error) throw error;
+      msgEl.textContent = 'Проверьте почту и перейдите по ссылке, чтобы подтвердить регистрацию, затем войдите.';
+      msgEl.classList.add('ok');
+      setAuthMode('signin');
+    } else {
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      if(error) throw error;
+    }
+  }catch(e){
+    msgEl.textContent = e.message || 'Что-то пошло не так.';
+    msgEl.classList.add('error');
+  }
+  document.getElementById('authSubmit').disabled = false;
+});
+
+async function signOut(){
+  await sb.auth.signOut();
+}
+
+sb.auth.onAuthStateChange((_event, session)=>{
+  currentUser = session ? session.user : null;
+  const overlay = document.getElementById('authOverlay');
+  if(currentUser){
+    overlay.classList.add('hidden');
+    loadData();
+  } else {
+    overlay.classList.remove('hidden');
+  }
+});
+
+/* ---------- content banks ---------- */
+const LISTENING_BANK = [
+  {title:"University Library Hours", qtype:"Multiple Choice", script:"Hello and welcome to the university library. I just want to give you some quick information about our opening hours. During term time, the library is open from eight in the morning until eleven at night, Monday to Friday. On Saturdays we open a little later, at ten, and close earlier, at six in the evening. On Sundays we are open from twelve until six. Please remember that during exam period, in May and June, we extend our hours and stay open twenty four hours a day. If you need any help finding a book, the information desk is on the ground floor, right next to the main entrance.",
+   qs:[
+     {type:"mcq",q:"On weekdays, what time does the library close?",opts:["Six in the evening","Eleven at night","Twelve at night"],a:1},
+     {type:"mcq",q:"When does the library stay open twenty four hours?",opts:["During the summer holidays","During exam period","Every weekend"],a:1},
+     {type:"mcq",q:"Where is the information desk?",opts:["On the ground floor near the entrance","On the top floor","Next to the exam hall"],a:0}
+   ]},
+  {title:"Weekend Weather Report", qtype:"Multiple Choice", script:"Good morning, here is your weekend weather. Saturday will start off cloudy with a chance of light rain in the morning, but it should clear up by the afternoon, with temperatures reaching around eighteen degrees. Sunday looks much better, with clear skies and sunshine all day, though it will be a little cooler, around fifteen degrees. If you are planning outdoor activities, Sunday afternoon is your best bet. Remember to bring an umbrella on Saturday morning just in case.",
+   qs:[
+     {type:"mcq",q:"What is the weather like on Saturday morning?",opts:["Sunny and warm","Cloudy with possible rain","Very cold and windy"],a:1},
+     {type:"mcq",q:"What is the temperature on Sunday?",opts:["Eighteen degrees","Twenty degrees","Fifteen degrees"],a:2},
+     {type:"mcq",q:"When is the best time for outdoor activities?",opts:["Saturday morning","Sunday afternoon","Both days equally"],a:1}
+   ]},
+  {title:"New Gym Membership", qtype:"Multiple Choice", script:"Thank you for calling City Fitness Centre. We currently have three membership options. The basic plan costs twenty five dollars a month and gives you access to the gym equipment only. The standard plan is forty dollars a month and includes group classes such as yoga and spinning. The premium plan is sixty dollars a month and includes everything in standard, plus a personal trainer session once a week. All new members also get a free fitness assessment when they join.",
+   qs:[
+     {type:"mcq",q:"How much does the standard plan cost?",opts:["Twenty five dollars","Forty dollars","Sixty dollars"],a:1},
+     {type:"mcq",q:"What does the premium plan include that standard does not?",opts:["Group classes","A personal trainer session","Free equipment"],a:1},
+     {type:"mcq",q:"What do all new members receive?",opts:["A free t-shirt","A free fitness assessment","A free class"],a:1}
+   ]},
+  {title:"Hotel Room Booking", qtype:"Form Completion", script:"Good afternoon, Lakeside Hotel, how can I help you? ... I would like to book a room for the fourteenth of September, for two nights. ... Certainly, can I take your name please? ... It's Sarah Mitchell, that's M I T C H E L L. ... And would you like a single or a double room? ... A double room please, with a view of the lake if possible. ... Of course, that will be an extra fifteen dollars per night. The total for two nights will be one hundred and ninety dollars, including breakfast.",
+   qs:[
+     {type:"gap",q:"Guest's surname:",a:["mitchell"]},
+     {type:"gap",q:"Check-in date: ___ September",a:["14","fourteenth","fourteen"]},
+     {type:"gap",q:"Room type requested:",a:["double"]},
+     {type:"gap",q:"Total cost for two nights: $___",a:["190","one hundred and ninety","one hundred ninety"]}
+   ]},
+  {title:"Study Group Schedule", qtype:"Form Completion", script:"Hi everyone, just confirming the details for our study group this week. We'll meet on Wednesday at four thirty in the afternoon, in room two twelve, on the second floor of the library building. Please bring your economics textbook, chapter seven specifically, since that's what we're reviewing. If you can't make it, let our group leader, Daniel, know by Tuesday evening at the latest.",
+   qs:[
+     {type:"gap",q:"Day of the meeting:",a:["wednesday"]},
+     {type:"gap",q:"Room number:",a:["212","two hundred and twelve","two twelve"]},
+     {type:"gap",q:"Chapter to review:",a:["7","seven"]},
+     {type:"gap",q:"Name of the group leader:",a:["daniel"]}
+   ]}
+];
+
+const READING_BANK = [
+  {title:"The History of Chocolate", qtype:"Multiple Choice",
+   passage:"Chocolate has a long history that stretches back over three thousand years. It began with the ancient Maya and Aztec civilizations in Central America, who prepared a bitter drink from cacao beans, often mixed with spices. This drink was very different from the sweet chocolate we know today. When Spanish explorers brought cacao back to Europe in the sixteenth century, people began adding sugar to make it more pleasant to taste. By the nineteenth century, inventors in Europe had found ways to turn cacao into solid chocolate bars, which quickly became popular around the world.",
+   qs:[
+     {type:"mcq",q:"Who first prepared drinks from cacao beans?",opts:["European inventors","The Maya and Aztec civilizations","Spanish explorers"],a:1},
+     {type:"mcq",q:"What did Europeans add to make the drink taste better?",opts:["Sugar","Milk","Salt"],a:0},
+     {type:"mcq",q:"When did solid chocolate bars appear?",opts:["Sixteenth century","Nineteenth century","Twentieth century"],a:1}
+   ]},
+  {title:"Urban Bee Keeping", qtype:"Multiple Choice",
+   passage:"In recent years, more and more people living in cities have started keeping bees on rooftops and in gardens. This trend, known as urban beekeeping, helps support local bee populations, which have been declining due to pesticide use and loss of natural habitats. Bees kept in cities often produce excellent honey, because urban areas can offer a wide variety of flowers from parks and gardens throughout the year. However, city beekeepers must follow certain rules, such as registering their hives and keeping them a safe distance from public paths, to avoid problems with neighbours.",
+   qs:[
+     {type:"mcq",q:"Why has urban beekeeping become popular?",opts:["To make cities look nicer","To help support declining bee populations","To reduce traffic in cities"],a:1},
+     {type:"mcq",q:"Why can city honey be excellent?",opts:["Cities have fewer insects","There is a wide variety of flowers","Bees work faster in cities"],a:1},
+     {type:"mcq",q:"What must city beekeepers do?",opts:["Pay a yearly fee to the government","Register their hives and follow safety rules","Only keep bees in winter"],a:1}
+   ]},
+  {title:"Coffee and Sleep", qtype:"True / False / Not Given",
+   passage:"Caffeine, the active ingredient in coffee, is known to increase alertness by blocking a chemical in the brain called adenosine, which normally builds up throughout the day and makes people feel sleepy. Because of this, drinking coffee in the afternoon or evening can make it harder to fall asleep at night, even for people who do not think caffeine affects them personally. Interestingly, studies show that the effects of caffeine can last much longer than most people realise, with noticeable amounts still present in the body six hours after it is consumed. For this reason, some sleep experts recommend avoiding coffee after two o'clock in the afternoon.",
+   qs:[
+     {type:"mcq",q:"Caffeine works by blocking a chemical called adenosine.",opts:["True","False","Not Given"],a:0},
+     {type:"mcq",q:"People who don't feel affected by caffeine can still have trouble sleeping because of it.",opts:["True","False","Not Given"],a:0},
+     {type:"mcq",q:"Caffeine leaves the body completely within two hours of drinking coffee.",opts:["True","False","Not Given"],a:1},
+     {type:"mcq",q:"Sleep experts agree that coffee should never be drunk before breakfast.",opts:["True","False","Not Given"],a:2}
+   ]},
+  {title:"The Growth of E-books", qtype:"Matching Headings",
+   passage:"Paragraph A. The concept of reading books on an electronic device dates back further than many people expect. The first dedicated e-reader devices appeared in the late 1990s, though they were bulky and expensive, and it was not until more affordable, lightweight devices launched in the following decade that e-books began to reach a wider audience.\n\nParagraph B. One of the biggest attractions of e-books is convenience. A single device can store thousands of titles, meaning travellers no longer need to choose which physical books to pack. E-books are also often cheaper than their printed versions, since they do not require paper, printing, or shipping.\n\nParagraph C. Despite these advantages, many readers remain loyal to printed books. Some find that staring at a screen for long periods causes eye strain, while others simply enjoy the physical experience of holding a book and turning its pages. For these readers, no digital replacement quite compares to a paperback.\n\nParagraph D. Looking ahead, experts predict that e-books and printed books will likely continue to exist side by side rather than one replacing the other completely, with each format appealing to different reading habits and occasions.",
+   qs:[
+     {type:"mcq",q:"Paragraph A",opts:["Where digital reading began","Benefits that convinced readers to switch","Why some readers still prefer paper","What the future might hold for reading"],a:0},
+     {type:"mcq",q:"Paragraph B",opts:["Where digital reading began","Benefits that convinced readers to switch","Why some readers still prefer paper","What the future might hold for reading"],a:1},
+     {type:"mcq",q:"Paragraph C",opts:["Where digital reading began","Benefits that convinced readers to switch","Why some readers still prefer paper","What the future might hold for reading"],a:2},
+     {type:"mcq",q:"Paragraph D",opts:["Where digital reading began","Benefits that convinced readers to switch","Why some readers still prefer paper","What the future might hold for reading"],a:3}
+   ]},
+  {title:"How Solar Panels Work", qtype:"Sentence Completion",
+   passage:"Solar panels convert sunlight into electricity using small units called photovoltaic cells. When sunlight hits these cells, it causes electrons to move, which creates an electric current. This current is direct current, or DC electricity, but most homes and businesses use alternating current, or AC. Because of this, an inverter is needed to convert the electricity produced by the panels into a form that can be used by ordinary household appliances. On average, a well-maintained solar panel can continue producing electricity efficiently for around twenty-five years before its performance noticeably declines.",
+   qs:[
+     {type:"gap",q:"Solar panels use small units called photovoltaic ___.",a:["cells"]},
+     {type:"gap",q:"The electricity produced directly by solar panels is called ___ electricity.",a:["direct","dc"]},
+     {type:"gap",q:"A device called an ___ converts DC electricity into AC electricity.",a:["inverter"]},
+     {type:"gap",q:"A solar panel typically works efficiently for about ___ years.",a:["25","twenty-five","twenty five"]}
+   ]},
+  {title:"The Rise of Remote Work", qtype:"Multiple Choice",
+   passage:"Remote work, where employees complete their jobs from home rather than in an office, has grown rapidly over the past decade. Advances in technology, such as video calling and cloud storage, have made it easier for teams to communicate and share files without being in the same building. Many workers report feeling happier and more productive when working remotely, largely because they save time on commuting. However, some companies worry that remote work can make collaboration and creative teamwork more difficult, since employees miss out on spontaneous face to face conversations.",
+   qs:[
+     {type:"mcq",q:"What has made remote work easier in recent years?",opts:["Cheaper rent","Advances in technology","Shorter working hours"],a:1},
+     {type:"mcq",q:"Why do many remote workers feel happier?",opts:["They earn more money","They save time on commuting","They work fewer days"],a:1},
+     {type:"mcq",q:"What concern do some companies have about remote work?",opts:["It costs more money","It can make collaboration harder","It reduces employee salaries"],a:1}
+   ]}
+];
+
+const WRITING_TASK2 = [
+  "Some people think that children should begin learning a foreign language at primary school, while others believe it is better to wait until secondary school. Discuss both views and give your opinion.",
+  "Many people believe that social media has a negative effect on the way people communicate with each other. To what extent do you agree or disagree?",
+  "Some people think governments should spend money on public transportation, while others believe the money should be spent on building more roads. Discuss both views and give your own opinion.",
+  "In many countries, more and more people are choosing to work from home. Do the advantages of this outweigh the disadvantages?"
+];
+
+const WRITING_TASK1 = [
+  {prompt:"The table below shows the number of visitors (in thousands) to three museums in a city between 2015 and 2020. Summarise the information by selecting and reporting the main features, and make comparisons where relevant. Write at least 150 words.",
+   data:"Year    Museum A   Museum B   Museum C\n2015      120          80          45\n2017      135          95          60\n2019      110         130          90\n2020       60         100          95\n\n(figures in thousands of visitors per year)"},
+  {prompt:"The chart below shows the percentage of households with internet access in four countries between 2000 and 2020. Summarise the information by selecting and reporting the main features, and make comparisons where relevant. Write at least 150 words.",
+   data:"Country      2000   2010   2020\nCountry A     15%    55%    92%\nCountry B      5%    30%    78%\nCountry C     35%    70%    95%\nCountry D     10%    40%    85%"},
+  {prompt:"The diagram below shows the process of how bottled water is produced. Summarise the information by describing the main stages of the process. Write at least 150 words.",
+   data:"Process stages:\n1. Water is collected from a natural spring source.\n2. The water passes through filters to remove particles and impurities.\n3. The filtered water is treated with UV light to kill bacteria.\n4. Water is pumped into a bottling machine and sealed into bottles.\n5. Bottles are labelled and packed into boxes.\n6. Boxes are transported to distribution centres and shops."}
+];
+
+const SPEAKING_PART1 = [
+  "Let's talk about your hometown. Can you describe the place where you grew up?",
+  "Do you enjoy reading? What kind of books do you like to read?",
+  "How do you usually spend your weekends?",
+  "Tell me about a hobby that you find interesting.",
+  "What kind of food do you like, and why?",
+  "Do you prefer travelling by plane, train, or car? Why?"
+];
+
+const SPEAKING_PART2 = [
+  {topic:"Describe a person who has influenced you.",bullets:["Who this person is","How you know them","What qualities they have","Explain why they have influenced you"]},
+  {topic:"Describe a place you visited that you found interesting.",bullets:["Where it is","When you went there","What you did there","Explain why you found it interesting"]},
+  {topic:"Describe a skill you would like to learn.",bullets:["What the skill is","Why you want to learn it","How you would learn it","Explain how it would help you"]}
+];
+
+/* ---------- 30-day plan ---------- */
+const BC = "https://takeielts.britishcouncil.org/take-ielts/prepare/free-ielts-english-practice-tests";
+const IDP = "https://ielts.idp.com/prepare/article-free-practice-tests";
+const IDP_FAM = "https://ielts.idp.com/about/ielts-familiarisation-tests";
+
+const PLAN = [
+  {w:1,d:1,focus:"Диагностика", tasks:[["Speaking","Пройдите ознакомительный тест и оцените стартовый уровень",IDP_FAM],["Writing","Изучите формат Task 1 / Task 2 на официальной странице",BC]]},
+  {w:1,d:2,focus:"Listening: формат", tasks:[["Listening","Тренажёр на этой платформе — текст №1",""],["Listening","Официальный пример Listening теста",BC]]},
+  {w:1,d:3,focus:"Reading: формат", tasks:[["Reading","Тренажёр на этой платформе — текст №1",""],["Reading","Официальный пример Reading теста",IDP]]},
+  {w:1,d:4,focus:"Writing Task 1 основы", tasks:[["Writing","Изучите структуру Task 1 (графики/диаграммы)",BC],["Writing","Напишите короткий Task 2 на платформе и получите AI-фидбек",""]]},
+  {w:1,d:5,focus:"Speaking Part 1", tasks:[["Speaking","Тренажёр Part 1 на платформе — 2 вопроса",""],["Speaking","Официальные примеры вопросов Part 1",BC]]},
+  {w:1,d:6,focus:"Listening практика", tasks:[["Listening","Тренажёр — текст №2",""],["Listening","Официальный Listening пример №2",IDP]]},
+  {w:1,d:7,focus:"Обзор недели", tasks:[["Reading","Повторите ошибки недели, тренажёр — текст №3",""],["Writing","Один AI-graded эссе на платформе",""]]},
+
+  {w:2,d:8,focus:"Reading: техники скимминга", tasks:[["Reading","Тренажёр — любой текст, засеките время (20 мин)",""],["Reading","Официальный Reading пример №2",BC]]},
+  {w:2,d:9,focus:"Listening: заметки на слух", tasks:[["Listening","Тренажёр — текст №3",""],["Listening","Официальный пример Listening №3",IDP]]},
+  {w:2,d:10,focus:"Writing Task 2: структура эссе", tasks:[["Writing","Эссе на платформе, тема discussion",""],["Writing","Официальные советы по Task 2",BC]]},
+  {w:2,d:11,focus:"Speaking Part 2", tasks:[["Speaking","Официальные примеры карточек Part 2",BC],["Speaking","Тренажёр Part 1 — 2 новых вопроса",""]]},
+  {w:2,d:12,focus:"Reading практика", tasks:[["Reading","Тренажёр — повтор сложного текста",""],["Reading","Официальный Reading пример №3",IDP]]},
+  {w:2,d:13,focus:"Listening практика", tasks:[["Listening","Тренажёр — любой текст на выбор",""],["Listening","Официальный Familiarisation Listening",IDP_FAM]]},
+  {w:2,d:14,focus:"Обзор недели + мини-мок", tasks:[["Writing","AI-graded эссе",""],["Speaking","AI-graded ответ Part 1",""]]},
+
+  {w:3,d:15,focus:"Timed Reading (полный официальный)", tasks:[["Reading","Пройдите официальный Reading тест на время (60 мин)",BC]]},
+  {w:3,d:16,focus:"Timed Listening (полный официальный)", tasks:[["Listening","Пройдите официальный Listening тест на время (30 мин)",IDP]]},
+  {w:3,d:17,focus:"Writing Task 1 практика", tasks:[["Writing","Опишите график/диаграмму (используйте свою тему)",""],["Writing","Официальные примеры Task 1",BC]]},
+  {w:3,d:18,focus:"Speaking full simulation", tasks:[["Speaking","Ответьте на 3 вопроса Part 1 подряд, запишите себя",""],["Speaking","Официальные примеры Part 3",IDP]]},
+  {w:3,d:19,focus:"Reading практика", tasks:[["Reading","Тренажёр — текст с новой лексикой",""]]},
+  {w:3,d:20,focus:"Listening практика", tasks:[["Listening","Тренажёр — текст с новой лексикой",""]]},
+  {w:3,d:21,focus:"Обзор недели + разбор ошибок", tasks:[["Writing","AI-graded эссе — тема, где были слабые места",""],["Speaking","AI-graded ответ — слабая тема",""]]},
+
+  {w:4,d:22,focus:"Официальный Familiarisation тест: Reading", tasks:[["Reading","Полный официальный Reading тест на компьютере",IDP_FAM]]},
+  {w:4,d:23,focus:"Официальный Familiarisation тест: Listening", tasks:[["Listening","Полный официальный Listening тест на компьютере",IDP_FAM]]},
+  {w:4,d:24,focus:"Официальный Familiarisation тест: Writing", tasks:[["Writing","Оба Task официального Writing теста",IDP_FAM]]},
+  {w:4,d:25,focus:"Speaking mock", tasks:[["Speaking","Полная симуляция Part 1-2-3, запишите себя",""],["Speaking","AI-graded ответ на платформе",""]]},
+  {w:4,d:26,focus:"Слабые места: Reading/Listening", tasks:[["Reading","Тренажёр — фокус на самый слабый тип вопросов",""],["Listening","Тренажёр — фокус на самый слабый тип вопросов",""]]},
+  {w:4,d:27,focus:"Слабые места: Writing/Speaking", tasks:[["Writing","AI-graded эссе — финальная проверка структуры",""],["Speaking","AI-graded ответ — финальная проверка беглости",""]]},
+  {w:4,d:28,focus:"Финальный полный мок", tasks:[["Reading","Официальный тест на время",BC],["Listening","Официальный тест на время",BC]]},
+  {w:4,d:29,focus:"Финальный полный мок (продолжение)", tasks:[["Writing","Оба Task на время (60 мин)",""],["Speaking","Полная симуляция интервью",""]]},
+  {w:4,d:30,focus:"Итоговый обзор", tasks:[["Reading","Проверьте маршрут на дашборде — прогресс по всем 4 навыкам",""]]}
+];
+
+function renderPlan(){
+  const el = document.getElementById('planWeeks');
+  el.innerHTML='';
+  const done = data.planDone || [];
+  document.getElementById('planDoneCount').textContent = done.length;
+  for(let w=1; w<=4; w++){
+    const days = PLAN.filter(p=>p.w===w);
+    const wrap = document.createElement('div');
+    wrap.className='practice-card';
+    wrap.innerHTML = `<h3 style="font-size:15px;margin-bottom:12px;">Неделя ${w}</h3>` + days.map(day=>{
+      const isDone = done.includes(day.d);
+      const tasksHtml = day.tasks.map(([skill,label,link])=>`
+        <div style="font-size:13px;color:var(--ink-soft);margin:3px 0 3px 0;">
+          <span class="tag" style="margin:0 6px 0 0;padding:1px 6px;">${skill}</span>${label}
+          ${link?` — <a href="${link}" target="_blank" style="color:var(--teal);">официальный тест ↗</a>`:''}
+        </div>`).join('');
+      return `<div style="border-top:1px solid var(--line);padding:10px 0;display:flex;gap:12px;align-items:flex-start;">
+        <input type="checkbox" ${isDone?'checked':''} onchange="togglePlanDay(${day.d})" style="margin-top:4px;width:16px;height:16px;flex-shrink:0;">
+        <div style="flex:1;">
+          <div style="font-weight:600;font-size:14px;${isDone?'text-decoration:line-through;color:var(--ink-soft);':''}">День ${day.d} · ${day.focus}</div>
+          ${tasksHtml}
+        </div>
+      </div>`;
+    }).join('');
+    el.appendChild(wrap);
+  }
+}
+
+async function togglePlanDay(d){
+  if(!data.planDone) data.planDone = [];
+  const idx = data.planDone.indexOf(d);
+  if(idx>=0) data.planDone.splice(idx,1);
+  else {
+    data.planDone.push(d);
+    if(!data.planDates) data.planDates=[];
+    data.planDates.push(new Date().toISOString());
+  }
+  await saveData();
+  renderPlan();
+  renderDashboard();
+}
+
+/* ---------- state ---------- */
+let data = {listening:[], reading:[], writing:[], speaking:[], planDone:[], planDates:[], vocab:[]};
+let currentListening = null, currentReading = null;
+let lAnswers = {}, rAnswers = {};
+
+async function loadData(){
+  data = {listening:[], reading:[], writing:[], speaking:[], planDone:[], planDates:[], vocab:[]};
+  if(!currentUser) return;
+  try{
+    const { data: row, error } = await sb.from('progress').select('data').eq('user_id', currentUser.id).maybeSingle();
+    if(error) throw error;
+    if(row && row.data) data = Object.assign(data, row.data);
+  }catch(e){ console.error('load failed', e); }
+  renderDashboard();
+  renderPlan();
+  renderVocab();
+}
+async function saveData(){
+  if(!currentUser) return;
+  try{
+    const { error } = await sb.from('progress').upsert({ user_id: currentUser.id, data, updated_at: new Date().toISOString() });
+    if(error) throw error;
+  }
+  catch(e){ console.error('storage save failed', e); }
+}
+
+/* accuracy fraction -> approx band (rough heuristic for self-tracking only) */
+function accToBand(frac){
+  if(frac >= 0.9) return 7.0;
+  if(frac >= 0.75) return 6.5;
+  if(frac >= 0.6) return 6.0;
+  if(frac >= 0.45) return 5.5;
+  if(frac >= 0.3) return 5.0;
+  return 4.5;
+}
+function avg(arr){ return arr.length? arr.reduce((a,b)=>a+b,0)/arr.length : null; }
+function skillBand(skill){
+  const entries = data[skill];
+  if(!entries.length) return null;
+  const last = entries.slice(-5);
+  return avg(last.map(e=>e.band));
+}
+function roundHalf(x){ return Math.round(x*2)/2; }
+
+/* ---------- tabs ---------- */
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('view-'+btn.dataset.view).classList.add('active');
+  });
+});
+
+/* ---------- dashboard render ---------- */
+function renderDashboard(){
+  const skills = [['listening','Listening'],['reading','Reading'],['writing','Writing'],['speaking','Speaking']];
+  const cardsEl = document.getElementById('skillCards');
+  cardsEl.innerHTML = '';
+  let bands = [];
+  skills.forEach(([key,label])=>{
+    const b = skillBand(key);
+    if(b!=null) bands.push(b);
+    const card = document.createElement('div');
+    card.className = 'skill-card';
+    card.innerHTML = `<div class="sname">${label}</div><div class="sband">${b!=null?b.toFixed(1):'—'}</div><div class="scount">${data[key].length} сессий</div>`;
+    cardsEl.appendChild(card);
+  });
+
+  const overall = bands.length ? roundHalf(avg(bands)) : null;
+  document.getElementById('overallBandTop').textContent = overall!=null ? overall.toFixed(1) : 'старт 3.5';
+
+  // stats
+  const totalSessions = skills.reduce((s,[k])=>s+data[k].length,0);
+  document.getElementById('statSessions').textContent = totalSessions;
+  document.getElementById('statAvg').textContent = overall!=null ? overall.toFixed(1) : '—';
+
+  const allDates = [...new Set([
+    ...skills.flatMap(([k])=>data[k].map(e=>e.date.slice(0,10))),
+    ...((data.planDates||[]).map(d=>d.slice(0,10)))
+  ])].sort();
+  let streak = 0;
+  if(allDates.length){
+    let d = new Date();
+    for(let i=0;i<60;i++){
+      const iso = d.toISOString().slice(0,10);
+      if(allDates.includes(iso)){ streak++; d.setDate(d.getDate()-1); }
+      else break;
+    }
+  }
+  document.getElementById('statStreak').textContent = streak;
+
+  // route map
+  const routeRows = document.getElementById('routeRows');
+  routeRows.innerHTML = '';
+  const target = 6.5, start = 3.5, min = 3.0, max = 7.0;
+  skills.forEach(([key,label])=>{
+    const b = skillBand(key) ?? start;
+    const pct = Math.min(100, Math.max(0, ((b-min)/(max-min))*100));
+    const tpct = ((target-min)/(max-min))*100;
+    const checks = [4.0,4.5,5.0,5.5,6.0,6.5].map(v=>{
+      const p = ((v-min)/(max-min))*100;
+      return `<span style="left:${p}%" data-b="${v}"></span>`;
+    }).join('');
+    const row = document.createElement('div');
+    row.className = 'route-row';
+    row.innerHTML = `
+      <div class="route-label">${label}</div>
+      <div class="route-track">
+        <div class="route-line"></div>
+        <div class="route-checks">${checks}</div>
+        <div class="route-marker" style="left:${pct}%"></div>
+        <div class="route-target" style="left:${tpct}%"></div>
+      </div>`;
+    routeRows.appendChild(row);
+  });
+
+  // history chart (last 10 sessions across all skills)
+  const all = skills.flatMap(([k,label])=>data[k].map(e=>({...e,skill:label})))
+    .sort((a,b)=> a.date.localeCompare(b.date)).slice(-10);
+  const histEl = document.getElementById('historyChart');
+  if(!all.length){
+    histEl.innerHTML = '<div class="empty-note">Пока нет данных — начните практику в любом разделе.</div>';
+  } else {
+    histEl.innerHTML = '<div class="bars">'+ all.map(e=>{
+      const h = Math.max(6, (e.band/9)*110);
+      return `<div class="bar-col"><div style="font-size:10px;color:var(--ink-soft)" class="mono">${e.band.toFixed(1)}</div>
+        <div class="bar-fill" style="height:${h}px"></div>
+        <div class="bar-date">${e.skill.slice(0,4)}</div></div>`;
+    }).join('') + '</div>';
+  }
+}
+
+/* ---------- LISTENING ---------- */
+function fillPick(selectId, bank){
+  document.getElementById(selectId).innerHTML = bank.map((e,i)=>`<option value="${i}">${e.title} — ${e.qtype}</option>`).join('');
+}
+fillPick('lPick', LISTENING_BANK);
+fillPick('rPick', READING_BANK);
+document.getElementById('lPick').addEventListener('change', e=>newListening(parseInt(e.target.value)));
+document.getElementById('rPick').addEventListener('change', e=>newReading(parseInt(e.target.value)));
+
+function renderQBlock(qs, prefix){
+  return qs.map((q,i)=>{
+    if(q.type==='gap'){
+      return `<div class="q-block"><p>${i+1}. ${q.q}</p><input type="text" class="gap-input" id="${prefix}q${i}" placeholder="ответ"></div>`;
+    }
+    return `<div class="q-block">
+      <p>${i+1}. ${q.q}</p>
+      ${q.opts.map((o,j)=>`<button class="q-opt" onclick="pick${prefix.toUpperCase()}(${i},${j})" id="${prefix}q${i}o${j}">${o}</button>`).join('')}
+    </div>`;
+  }).join('');
+}
+
+function newListening(idx){
+  currentListening = LISTENING_BANK[idx!=null? idx : Math.floor(Math.random()*LISTENING_BANK.length)];
+  lAnswers = {};
+  document.getElementById('lPick').value = LISTENING_BANK.indexOf(currentListening);
+  document.getElementById('lTag').textContent = 'LISTENING · ' + currentListening.qtype;
+  document.getElementById('lTitle').textContent = currentListening.title;
+  document.getElementById('lQuestions').innerHTML = renderQBlock(currentListening.qs, 'l');
+  document.getElementById('lResult').innerHTML = '';
+  document.getElementById('lSubmit').disabled = false;
+}
+function pickL(i,j){
+  lAnswers[i]=j;
+  currentListening.qs[i].opts.forEach((_,k)=>{
+    document.getElementById(`lq${i}o${k}`).classList.toggle('selected', k===j);
+  });
+}
+function speakScript(){
+  if(!currentListening) return;
+  const u = new SpeechSynthesisUtterance(currentListening.script);
+  u.rate = 0.88; u.lang = 'en-US';
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+async function submitListening(){
+  if(!currentListening) return;
+  let correct = 0;
+  currentListening.qs.forEach((q,i)=>{
+    if(q.type==='gap'){
+      const input = document.getElementById(`lq${i}`);
+      const val = (input.value||'').trim().toLowerCase();
+      const ok = q.a.some(acc=>val===acc.toLowerCase());
+      input.classList.add(ok?'correct':'wrong');
+      if(ok) correct++;
+    } else {
+      const chosen = lAnswers[i];
+      q.opts.forEach((_,j)=>{
+        const el = document.getElementById(`lq${i}o${j}`);
+        if(j===q.a) el.classList.add('correct');
+        else if(j===chosen) el.classList.add('wrong');
+      });
+      if(chosen===q.a) correct++;
+    }
+  });
+  const frac = correct/currentListening.qs.length;
+  const band = accToBand(frac);
+  data.listening.push({date:new Date().toISOString(), band, correct, total:currentListening.qs.length});
+  await saveData();
+  document.getElementById('lResult').innerHTML = `<div class="result-line">Правильно: ${correct} из ${currentListening.qs.length} · примерный band: ${band.toFixed(1)}</div>`;
+  document.getElementById('lSubmit').disabled = true;
+  renderDashboard();
+}
+
+/* ---------- READING ---------- */
+function newReading(idx){
+  currentReading = READING_BANK[idx!=null? idx : Math.floor(Math.random()*READING_BANK.length)];
+  rAnswers = {};
+  document.getElementById('rPick').value = READING_BANK.indexOf(currentReading);
+  document.getElementById('rTag').textContent = 'READING · ' + currentReading.qtype;
+  document.getElementById('rTitle').textContent = currentReading.title;
+  document.getElementById('rPassage').textContent = currentReading.passage;
+  document.getElementById('rQuestions').innerHTML = renderQBlock(currentReading.qs, 'r');
+  document.getElementById('rResult').innerHTML = '';
+  document.getElementById('rSubmit').disabled = false;
+}
+function pickR(i,j){
+  rAnswers[i]=j;
+  currentReading.qs[i].opts.forEach((_,k)=>{
+    document.getElementById(`rq${i}o${k}`).classList.toggle('selected', k===j);
+  });
+}
+async function submitReading(){
+  if(!currentReading) return;
+  let correct = 0;
+  currentReading.qs.forEach((q,i)=>{
+    if(q.type==='gap'){
+      const input = document.getElementById(`rq${i}`);
+      const val = (input.value||'').trim().toLowerCase();
+      const ok = q.a.some(acc=>val===acc.toLowerCase());
+      input.classList.add(ok?'correct':'wrong');
+      if(ok) correct++;
+    } else {
+      const chosen = rAnswers[i];
+      q.opts.forEach((_,j)=>{
+        const el = document.getElementById(`rq${i}o${j}`);
+        if(j===q.a) el.classList.add('correct');
+        else if(j===chosen) el.classList.add('wrong');
+      });
+      if(chosen===q.a) correct++;
+    }
+  });
+  const frac = correct/currentReading.qs.length;
+  const band = accToBand(frac);
+  data.reading.push({date:new Date().toISOString(), band, correct, total:currentReading.qs.length});
+  await saveData();
+  document.getElementById('rResult').innerHTML = `<div class="result-line">Правильно: ${correct} из ${currentReading.qs.length} · примерный band: ${band.toFixed(1)}</div>`;
+  document.getElementById('rSubmit').disabled = true;
+  renderDashboard();
+}
+
+/* ---------- WRITING / SPEAKING (AI graded) ---------- */
+let writeMode = 2, speakMode = 1;
+
+function fillSelect(id, items){
+  const el = document.getElementById(id);
+  el.innerHTML = items.map((t,i)=>`<option value="${i}">${t.length>70? t.slice(0,70)+'…': t}</option>`).join('');
+}
+
+function setWriteMode(m){
+  writeMode = m;
+  document.getElementById('wTab1').classList.toggle('active', m===1);
+  document.getElementById('wTab2').classList.toggle('active', m===2);
+  document.getElementById('wTag').textContent = 'WRITING TASK ' + m;
+  if(m===1){
+    fillSelect('wPrompt', WRITING_TASK1.map(t=>t.prompt));
+    document.getElementById('wData').style.display = 'block';
+    document.getElementById('wData').textContent = WRITING_TASK1[0].data;
+    document.getElementById('wText').placeholder = 'Опишите данные своими словами (минимум 150 слов)...';
+  } else {
+    fillSelect('wPrompt', WRITING_TASK2);
+    document.getElementById('wData').style.display = 'none';
+    document.getElementById('wText').placeholder = 'Начните писать эссе здесь (рекомендуется 250+ слов)...';
+  }
+}
+document.getElementById('wPrompt').addEventListener('change', e=>{
+  if(writeMode===1) document.getElementById('wData').textContent = WRITING_TASK1[e.target.value].data;
+});
+
+function setSpeakMode(m){
+  speakMode = m;
+  document.getElementById('sTab1').classList.toggle('active', m===1);
+  document.getElementById('sTab2').classList.toggle('active', m===2);
+  document.getElementById('sTag').textContent = 'SPEAKING PART ' + m;
+  if(m===2){
+    fillSelect('sPrompt', SPEAKING_PART2.map(t=>t.topic));
+    document.getElementById('sCue').style.display = 'block';
+    renderCue(0);
+    document.getElementById('sText').placeholder = 'У вас 1 минута на подготовку. Напишите развёрнутый ответ на 2 минуты (как будто говорите)...';
+  } else {
+    fillSelect('sPrompt', SPEAKING_PART1);
+    document.getElementById('sCue').style.display = 'none';
+    document.getElementById('sText').placeholder = 'Напишите, что бы вы ответили устно на этот вопрос (как будто говорите)...';
+  }
+}
+function renderCue(i){
+  const c = SPEAKING_PART2[i];
+  document.getElementById('sCue').innerHTML = `<b>${c.topic}</b><br>You should say:<br>` + c.bullets.map(b=>`• ${b}`).join('<br>');
+}
+document.getElementById('sPrompt').addEventListener('change', e=>{
+  if(speakMode===2) renderCue(e.target.value);
+});
+
+setWriteMode(2);
+setSpeakMode(1);
+
+document.getElementById('wText').addEventListener('input', e=>{
+  document.getElementById('wCount').textContent = e.target.value.trim().split(/\s+/).filter(Boolean).length;
+});
+document.getElementById('sText').addEventListener('input', e=>{
+  document.getElementById('sCount').textContent = e.target.value.trim().split(/\s+/).filter(Boolean).length;
+});
+
+async function gradeWithAI(systemPrompt, userText){
+  const { data: { session } } = await sb.auth.getSession();
+  if(!session) throw new Error('Не авторизован');
+  const response = await fetch("/api/grade", {
+    method: "POST",
+    headers: {"Content-Type":"application/json", "Authorization":"Bearer "+session.access_token},
+    body: JSON.stringify({ system: systemPrompt, message: userText })
+  });
+  if(!response.ok) throw new Error('Ошибка оценки (' + response.status + ')');
+  const json = await response.json();
+  const text = (json.content||[]).map(c=>c.text||'').join('\n');
+  const clean = text.replace(/```json|```/g,'').trim();
+  return JSON.parse(clean);
+}
+
+async function submitWriting(){
+  const promptIdx = document.getElementById('wPrompt').value;
+  const isTask1 = writeMode===1;
+  const prompt = isTask1 ? WRITING_TASK1[promptIdx].prompt : WRITING_TASK2[promptIdx];
+  const dataText = isTask1 ? WRITING_TASK1[promptIdx].data : '';
+  const essay = document.getElementById('wText').value.trim();
+  const resEl = document.getElementById('wResult');
+  const minWords = isTask1 ? 30 : 40;
+  if(essay.split(/\s+/).filter(Boolean).length < minWords){
+    resEl.innerHTML = `<div class="result-line" style="color:var(--red)">Напишите хотя бы ${minWords} слов, чтобы получить оценку.</div>`;
+    return;
+  }
+  document.getElementById('wSubmit').disabled = true;
+  resEl.innerHTML = '<div class="loading">AI анализирует ваш текст...</div>';
+  try{
+    const sys = `You are an IELTS Writing Task ${isTask1?1:2} examiner grading for a beginner-level student targeting band 6.0-6.5. ${isTask1? "Judge Task Achievement (are key features and comparisons covered accurately), Coherence, Vocabulary, and Grammar." : "Judge Task Response, Coherence and Cohesion, Vocabulary, and Grammar."} Respond ONLY with strict JSON, no markdown fences, no preamble, matching exactly this schema: {"band": number (0.5 increments, realistic for the level shown), "strengths": string (2-3 sentences, in Russian), "improvements": string (3-4 concrete, actionable sentences in Russian), "corrected_example": string (one improved rewritten sentence taken from the student's text, in English)}.`;
+    const userMsg = `Task prompt: ${prompt}\n${dataText? '\nData given to student:\n'+dataText+'\n':''}\nStudent's ${isTask1?'report':'essay'}:\n${essay}`;
+    const result = await gradeWithAI(sys, userMsg);
+    data.writing.push({date:new Date().toISOString(), band:result.band, task:writeMode});
+    await saveData();
+    resEl.innerHTML = `<div class="feedback-box">
+      <div class="fband">Band ${Number(result.band).toFixed(1)}</div>
+      <h4>Сильные стороны</h4><p>${result.strengths}</p>
+      <h4>Что улучшить</h4><p>${result.improvements}</p>
+      <h4>Пример улучшения</h4><p style="font-style:italic">${result.corrected_example}</p>
+    </div>`;
+    renderDashboard();
+  }catch(e){
+    resEl.innerHTML = '<div class="result-line" style="color:var(--red)">Не удалось получить оценку. Попробуйте ещё раз.</div>';
+  }
+  document.getElementById('wSubmit').disabled = false;
+}
+
+async function submitSpeaking(){
+  const promptIdx = document.getElementById('sPrompt').value;
+  const isPart2 = speakMode===2;
+  const prompt = isPart2 ? SPEAKING_PART2[promptIdx].topic + ' (' + SPEAKING_PART2[promptIdx].bullets.join('; ') + ')' : SPEAKING_PART1[promptIdx];
+  const answer = document.getElementById('sText').value.trim();
+  const resEl = document.getElementById('sResult');
+  const minWords = isPart2 ? 60 : 15;
+  if(answer.split(/\s+/).filter(Boolean).length < minWords){
+    resEl.innerHTML = `<div class="result-line" style="color:var(--red)">Напишите развёрнутый ответ (хотя бы ${minWords} слов).</div>`;
+    return;
+  }
+  document.getElementById('sSubmit').disabled = true;
+  resEl.innerHTML = '<div class="loading">AI анализирует ваш ответ...</div>';
+  try{
+    const sys = `You are an IELTS Speaking Part ${isPart2?2:1} examiner grading for a beginner-level student targeting band 6.0-6.5. The student typed out what they would say aloud. Respond ONLY with strict JSON, no markdown fences, no preamble, matching exactly this schema: {"band": number (0.5 increments, realistic for the level shown), "strengths": string (2-3 sentences, in Russian), "improvements": string (3-4 concrete, actionable sentences in Russian, focused on fluency, vocabulary range, grammar), "corrected_example": string (one improved rewritten sentence from the answer, in English)}.`;
+    const userMsg = `Question/Cue card: ${prompt}\n\nStudent's spoken answer (transcribed):\n${answer}`;
+    const result = await gradeWithAI(sys, userMsg);
+    data.speaking.push({date:new Date().toISOString(), band:result.band, part:speakMode});
+    await saveData();
+    resEl.innerHTML = `<div class="feedback-box">
+      <div class="fband">Band ${Number(result.band).toFixed(1)}</div>
+      <h4>Сильные стороны</h4><p>${result.strengths}</p>
+      <h4>Что улучшить</h4><p>${result.improvements}</p>
+      <h4>Пример улучшения</h4><p style="font-style:italic">${result.corrected_example}</p>
+    </div>`;
+    renderDashboard();
+  }catch(e){
+    resEl.innerHTML = '<div class="result-line" style="color:var(--red)">Не удалось получить оценку. Попробуйте ещё раз.</div>';
+  }
+  document.getElementById('sSubmit').disabled = false;
+}
+
+/* ---------- VOCABULARY ---------- */
+async function lookupWord(){
+  const word = document.getElementById('vWord').value.trim().toLowerCase();
+  const el = document.getElementById('vResult');
+  if(!word){ el.innerHTML=''; return; }
+  el.innerHTML = '<div class="loading">Ищу в словаре...</div>';
+  try{
+    const res = await fetch('https://api.dictionaryapi.dev/api/v2/entries/en/'+encodeURIComponent(word));
+    if(!res.ok) throw new Error('not found');
+    const arr = await res.json();
+    const entry = arr[0];
+    const phonetic = entry.phonetic || (entry.phonetics.find(p=>p.text)||{}).text || '';
+    const audioObj = entry.phonetics.find(p=>p.audio);
+    const audio = audioObj ? audioObj.audio : '';
+    let html = `<div class="feedback-box" style="border-left-color:var(--teal);">
+      <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;">
+        <span style="font-family:'Fraunces',serif;font-size:24px;font-weight:600;">${entry.word}</span>
+        ${phonetic?`<span class="mono" style="color:var(--ink-soft);">${phonetic}</span>`:''}
+        ${audio?`<button class="btn secondary" style="padding:4px 12px;font-size:12px;" onclick="new Audio('${audio}').play()">🔊</button>`:''}
+        <button class="btn" style="padding:4px 12px;font-size:12px;margin-left:auto;" onclick='saveWord(${JSON.stringify(JSON.stringify({word:entry.word,def:(entry.meanings[0].definitions[0].definition||"")}))})'>+ Сохранить</button>
+      </div>`;
+    entry.meanings.slice(0,3).forEach(m=>{
+      html += `<h4>${m.partOfSpeech}</h4>`;
+      m.definitions.slice(0,2).forEach(d=>{
+        html += `<p style="margin:2px 0;">• ${d.definition}${d.example?`<br><span style="font-style:italic;color:var(--ink-soft);">"${d.example}"</span>`:''}</p>`;
+      });
+      if(m.synonyms && m.synonyms.length) html += `<p style="font-size:12.5px;color:var(--teal);">синонимы: ${m.synonyms.slice(0,6).join(', ')}</p>`;
+    });
+    html += `<p style="font-size:11px;color:var(--ink-soft);margin-top:10px;">Источник: Free Dictionary API (Wiktionary / public domain)</p></div>`;
+    el.innerHTML = html;
+  }catch(e){
+    el.innerHTML = '<div class="result-line" style="color:var(--red)">Слово не найдено. Проверьте написание.</div>';
+  }
+}
+
+async function saveWord(payload){
+  const obj = JSON.parse(payload);
+  if(!data.vocab) data.vocab = [];
+  if(!data.vocab.find(v=>v.word===obj.word)){
+    data.vocab.push(obj);
+    await saveData();
+    renderVocab();
+  }
+}
+async function removeWord(w){
+  data.vocab = (data.vocab||[]).filter(v=>v.word!==w);
+  await saveData();
+  renderVocab();
+}
+function renderVocab(){
+  const el = document.getElementById('vSaved');
+  const list = data.vocab||[];
+  document.getElementById('vCount').textContent = list.length? '('+list.length+')' : '';
+  if(!list.length){ el.innerHTML = '<div class="empty-note">Пока пусто — найдите слово и нажмите «Сохранить».</div>'; return; }
+  el.innerHTML = list.map(v=>`<div style="border-top:1px solid var(--line);padding:9px 0;display:flex;gap:10px;align-items:flex-start;">
+    <div style="flex:1;"><b>${v.word}</b> — <span style="color:var(--ink-soft);font-size:13.5px;">${v.def}</span></div>
+    <button class="btn secondary" style="padding:2px 10px;font-size:12px;" onclick="removeWord('${v.word.replace(/'/g,"\\'")}')">✕</button>
+  </div>`).join('');
+}
+
+/* ---------- init ---------- */
+newListening();
+newReading();
+setAuthMode('signin');
+</script>
+</body>
+</html>
