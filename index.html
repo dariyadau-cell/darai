@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>IELTS Route</title>
+<title>DarAI</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
@@ -47,6 +47,24 @@ header.top{
   text-align:right;
 }
 .target-pill b{color:var(--ink);font-size:16px;}
+
+.streak-badge{
+  font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;
+  color:var(--red);background:#FCE9E4;border:1px solid #EFC3B7;border-radius:14px;
+  padding:3px 11px;letter-spacing:.02em;white-space:nowrap;
+}
+.streak-badge.cold{color:var(--ink-soft);background:transparent;border-color:var(--line);}
+
+.leaderboard-row{
+  display:flex;align-items:center;gap:14px;padding:10px 4px;
+  border-bottom:1px solid var(--line);
+}
+.leaderboard-row:last-child{border-bottom:none;}
+.leaderboard-row.me{background:var(--gold-soft);border-radius:8px;padding-left:10px;padding-right:10px;}
+.lb-rank{width:26px;font-family:'IBM Plex Mono',monospace;font-weight:600;color:var(--ink-soft);}
+.lb-name{flex:1;font-weight:600;}
+.lb-band{width:50px;text-align:right;font-weight:600;color:var(--gold);}
+.lb-sessions{width:80px;text-align:right;color:var(--ink-soft);font-size:12.5px;}
 
 /* tabs */
 nav.tabs{display:flex;gap:6px;margin-bottom:24px;flex-wrap:wrap;}
@@ -129,6 +147,11 @@ nav.tabs button.active{background:var(--ink);border-color:var(--ink);color:var(-
   background:var(--gold-soft);color:#7A5A20;padding:2px 8px;border-radius:10px;margin-bottom:10px;
 }
 .passage{background:var(--paper);border-radius:8px;padding:14px 16px;font-size:14.5px;line-height:1.6;margin:12px 0;white-space:pre-line;}
+.word-click{cursor:pointer;border-radius:3px;transition:.1s;}
+.word-click:hover{background:var(--gold-soft);}
+
+#micBtn.mic-active{background:var(--red);border-color:var(--red);color:#fff;animation:mic-pulse 1.4s ease-in-out infinite;}
+@keyframes mic-pulse{0%,100%{opacity:1;}50%{opacity:.65;}}
 .gap-input{
   width:auto;min-width:160px;display:inline-block;border:1.5px solid var(--line);
   border-radius:6px;padding:6px 10px;font-size:14px;font-family:'Inter',sans-serif;
@@ -208,6 +231,7 @@ textarea{min-height:180px;resize:vertical;line-height:1.55;}
   <div class="auth-card">
     <h2 id="authTitle">Вход</h2>
     <div class="auth-sub" id="authSub">Войдите, чтобы синхронизировать прогресс между устройствами.</div>
+    <input type="text" id="authUsername" class="hidden" placeholder="Имя для рейтинга (видно другим)" autocomplete="nickname">
     <input type="email" id="authEmail" placeholder="Email" autocomplete="username">
     <input type="password" id="authPassword" placeholder="Пароль" autocomplete="current-password">
     <div class="btn-row" style="margin-top:4px;">
@@ -222,8 +246,9 @@ textarea{min-height:180px;resize:vertical;line-height:1.55;}
 
   <header class="top">
     <div class="brand">
-      <h1>IELTS Route</h1>
+      <h1>DarAI</h1>
       <span class="stamp">TARGET 6.0–6.5</span>
+      <span class="streak-badge cold" id="streakBadge" title="Дней подряд с практикой">🔥 0</span>
     </div>
     <div class="target-pill">Прогресс к цели<br><b id="overallBandTop">—</b><br><button class="logout-btn" onclick="signOut()">Выйти</button></div>
   </header>
@@ -236,6 +261,7 @@ textarea{min-height:180px;resize:vertical;line-height:1.55;}
     <button class="tab-btn" data-view="writing">Writing</button>
     <button class="tab-btn" data-view="speaking">Speaking</button>
     <button class="tab-btn" data-view="vocab">Словарь</button>
+    <button class="tab-btn" data-view="leaderboard">Рейтинг</button>
   </nav>
 
   <!-- DASHBOARD -->
@@ -306,6 +332,8 @@ textarea{min-height:180px;resize:vertical;line-height:1.55;}
       <h3 id="rTitle">—</h3>
       <select id="rPick" style="margin-bottom:12px;"></select>
       <div class="passage" id="rPassage"></div>
+      <div style="font-size:12px;color:var(--ink-soft);margin:-6px 0 10px;">Кликните по любому слову в тексте — покажется перевод, можно сразу сохранить в словарь.</div>
+      <div id="rWordCard" style="display:none;margin-bottom:14px;"></div>
       <div id="rQuestions"></div>
       <div class="btn-row">
         <button class="btn" id="rSubmit" onclick="submitReading()">Проверить ответы</button>
@@ -328,8 +356,10 @@ textarea{min-height:180px;resize:vertical;line-height:1.55;}
       <textarea id="wText" placeholder="Начните писать здесь..."></textarea>
       <div class="wordcount"><span id="wCount">0</span> слов</div>
       <div class="btn-row">
+        <button class="btn secondary" id="wHintBtn" onclick="requestAiHelp('writing')">AI-подсказки к черновику</button>
         <button class="btn" id="wSubmit" onclick="submitWriting()">Получить оценку от AI</button>
       </div>
+      <div id="wHints"></div>
       <div id="wResult"></div>
     </div>
   </div>
@@ -345,11 +375,17 @@ textarea{min-height:180px;resize:vertical;line-height:1.55;}
       <h3>Выберите вопрос</h3>
       <select id="sPrompt"></select>
       <div id="sCue" class="passage" style="display:none;"></div>
-      <textarea id="sText" placeholder="Напишите, что бы вы ответили устно на этот вопрос (как будто говорите)..."></textarea>
+      <textarea id="sText" placeholder="Напишите, что бы вы ответили устно на этот вопрос (как будто говорите)... или наговорите ответ микрофоном ниже."></textarea>
       <div class="wordcount"><span id="sCount">0</span> слов</div>
+      <div class="btn-row" style="margin-top:0;">
+        <button class="btn secondary" id="micBtn" onclick="toggleMic()">🎤 Говорить в микрофон</button>
+        <span id="micStatus" style="font-size:12.5px;color:var(--ink-soft);"></span>
+      </div>
       <div class="btn-row">
+        <button class="btn secondary" id="sHintBtn" onclick="requestAiHelp('speaking')">AI-подсказки к ответу</button>
         <button class="btn" id="sSubmit" onclick="submitSpeaking()">Получить оценку от AI</button>
       </div>
+      <div id="sHints"></div>
       <div id="sResult"></div>
     </div>
   </div>
@@ -370,8 +406,27 @@ textarea{min-height:180px;resize:vertical;line-height:1.55;}
       <div id="vResult" style="margin-top:16px;"></div>
     </div>
     <div class="practice-card">
-      <h3 style="font-size:16px;">Мои слова <span class="mono" style="font-size:13px;color:var(--ink-soft);" id="vCount"></span></h3>
-      <div id="vSaved"></div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <h3 style="font-size:16px;margin:0;">Мои слова <span class="mono" style="font-size:13px;color:var(--ink-soft);" id="vCount"></span></h3>
+        <button class="btn secondary" id="vReviewBtn" style="margin-left:auto;padding:6px 14px;font-size:13px;" onclick="startReview()" disabled>🔁 Повторить слова</button>
+      </div>
+      <div id="vSaved" style="margin-top:10px;"></div>
+    </div>
+    <div class="practice-card" id="vReviewCard" style="display:none;">
+      <span class="tag">ПОВТОРЕНИЕ</span>
+      <div id="vReviewBody" style="margin-top:10px;"></div>
+    </div>
+  </div>
+
+  <!-- LEADERBOARD -->
+  <div class="view" id="view-leaderboard">
+    <div class="practice-card">
+      <span class="tag">РЕЙТИНГ · все зарегистрированные</span>
+      <h3>Кто впереди</h3>
+      <p style="font-size:13.5px;color:var(--ink-soft);line-height:1.6;">
+        Сортировка по среднему band-баллу (последние 5 сессий на навык). Виден только ник и баллы — детали практики остаются только у вас.
+      </p>
+      <div id="leaderboardList" style="margin-top:14px;"></div>
     </div>
   </div>
 
@@ -380,8 +435,8 @@ textarea{min-height:180px;resize:vertical;line-height:1.55;}
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script>
 /* ---------- Supabase config — замени на значения из своего проекта (Settings → API) ---------- */
-const SUPABASE_URL = 'https://YOUR-PROJECT.supabase.co';
-const SUPABASE_ANON_KEY = 'YOUR-ANON-PUBLIC-KEY';
+const SUPABASE_URL = 'https://riwncwhzjfatxjiiolum.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_tKxasIuXeB1Zfw77EZdr-g_ZiYQaZa-';
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let currentUser = null;
@@ -394,12 +449,15 @@ function setAuthMode(mode){
   const submit = document.getElementById('authSubmit');
   const switchEl = document.getElementById('authSwitch');
   document.getElementById('authMsg').textContent = '';
+  const usernameEl = document.getElementById('authUsername');
   if(mode === 'signup'){
     title.textContent = 'Регистрация';
     sub.textContent = 'Создайте аккаунт, чтобы прогресс сохранялся и синхронизировался между устройствами.';
     submit.textContent = 'Зарегистрироваться';
     switchEl.innerHTML = 'Уже есть аккаунт? <a onclick="setAuthMode(\'signin\')">Войти</a>';
+    usernameEl.classList.remove('hidden');
   } else {
+    usernameEl.classList.add('hidden');
     title.textContent = 'Вход';
     sub.textContent = 'Войдите, чтобы синхронизировать прогресс между устройствами.';
     submit.textContent = 'Войти';
@@ -410,13 +468,15 @@ function setAuthMode(mode){
 document.getElementById('authSubmit').addEventListener('click', async ()=>{
   const email = document.getElementById('authEmail').value.trim();
   const password = document.getElementById('authPassword').value;
+  const username = document.getElementById('authUsername').value.trim();
   const msgEl = document.getElementById('authMsg');
   msgEl.className = 'auth-msg';
   if(!email || !password){ msgEl.textContent = 'Заполните email и пароль.'; msgEl.classList.add('error'); return; }
+  if(authMode === 'signup' && !username){ msgEl.textContent = 'Введите имя для рейтинга.'; msgEl.classList.add('error'); return; }
   document.getElementById('authSubmit').disabled = true;
   try{
     if(authMode === 'signup'){
-      const { error } = await sb.auth.signUp({ email, password });
+      const { error } = await sb.auth.signUp({ email, password, options:{ data:{ username } } });
       if(error) throw error;
       msgEl.textContent = 'Проверьте почту и перейдите по ссылке, чтобы подтвердить регистрацию, затем войдите.';
       msgEl.classList.add('ok');
@@ -528,6 +588,31 @@ const READING_BANK = [
      {type:"mcq",q:"What has made remote work easier in recent years?",opts:["Cheaper rent","Advances in technology","Shorter working hours"],a:1},
      {type:"mcq",q:"Why do many remote workers feel happier?",opts:["They earn more money","They save time on commuting","They work fewer days"],a:1},
      {type:"mcq",q:"What concern do some companies have about remote work?",opts:["It costs more money","It can make collaboration harder","It reduces employee salaries"],a:1}
+   ]},
+  {title:"Dung Beetles (official IELTS sample — Diagram Label Completion)", qtype:"Diagram Label Completion",
+   passage:"Introducing dung beetles into a pasture is a simple process: approximately 1,500 beetles are released, a handful at a time, into fresh cow pats in the cow pasture. The beetles immediately disappear beneath the pats digging and tunnelling and, if they successfully adapt to their new environment, soon become a permanent, self-sustaining part of the local ecology. In time they multiply and within three or four years the benefits to the pasture are obvious.\n\nDung beetles work from the inside of the pat so they are sheltered from predators such as birds and foxes. Most species burrow into the soil and bury dung in tunnels directly underneath the pats, which are hollowed out from within. Some large species originating from France excavate tunnels to a depth of approximately 30 cm below the dung pat. These beetles make sausage-shaped brood chambers along the tunnels. The shallowest tunnels belong to a much smaller Spanish species that buries dung in chambers that hang like fruit from the branches of a pear tree. South African beetles dig narrow tunnels of approximately 20 cm below the surface of the pat. Some surface-dwelling beetles, including a South African species, cut perfectly-shaped balls from the pat, which are rolled away and attached to the bases of plants.\n\nFor maximum dung burial in spring, summer and autumn, farmers require a variety of species with overlapping periods of activity. In the cooler environments of the state of Victoria, the large French species (2.5 cms long), is matched with smaller (half this size), temperate-climate Spanish species. The former are slow to recover from the winter cold and produce only one or two generations of offspring from late spring until autumn. The latter, which multiply rapidly in early spring, produce two to five generations annually. The South African ball-rolling species, being a sub-tropical beetle, prefers the climate of northern and coastal New South Wales where it commonly works with the South African tunnelling species. In warmer climates, many species are active for longer periods of the year.\n\nОфициальная задача (British Council): на диаграмме показана коровья лепёшка (cow pat) и три тоннеля дельниц под ней, на шкале глубины 0–30 см. Ниже — эти же 3 тоннеля описаны словами вместо картинки: определите вид жука для каждого по словарю (Dung Beetle Types): French, Spanish, Mediterranean, South African, Australian native, South African ball roller.",
+   qs:[
+     {type:"mcq",q:"Тоннель 6: узкий, уходит на среднюю глубину — примерно 20 см от поверхности лепёшки. Какой это вид жука?",opts:["French","Spanish","Mediterranean","South African","Australian native","South African ball roller"],a:3},
+     {type:"mcq",q:"Тоннель 7: самый глубокий из трёх — примерно 30 см, с колбасовидными (sausage-shaped) камерами вдоль тоннеля. Какой это вид жука?",opts:["French","Spanish","Mediterranean","South African","Australian native","South African ball roller"],a:0},
+     {type:"mcq",q:"Тоннель 8: самый неглубокий — камеры расположены прямо под поверхностью, «как фрукты на ветках груши». Какой это вид жука?",opts:["French","Spanish","Mediterranean","South African","Australian native","South African ball roller"],a:1}
+   ]},
+  {title:"The Sound of Stone", qtype:"Matching Headings / True-False-NG / Summary Completion",
+   passage:"Paragraph A. When archaeologists excavate a prehistoric monument, they record its dimensions, its materials and its orientation to the sun. What they have rarely recorded is how it sounds. Over the past four decades, however, a small group of researchers has argued that this omission matters. Their field, variously called acoustic archaeology or archaeoacoustics, proceeds from a simple observation: many ancient structures do remarkable things to the human voice. Chambers amplify certain pitches and swallow others; corridors return echoes with a delay long enough to be heard as a separate event. The question that has occupied the discipline ever since is whether such effects were designed, or whether they are merely what happens when people pile stone into enclosed shapes.\n\nParagraph B. Establishing what a site sounds like is, in principle, straightforward. A researcher generates a burst of sound — traditionally a starter pistol, now more often a swept electronic tone — and records how the space responds. From this impulse response a set of standard measures can be derived, the best known being reverberation time, the interval a sound takes to decay to inaudibility. For much of the twentieth century such work required equipment that was heavy, expensive and unsuited to remote hillsides. The arrival of laptop-based analysis changed this. A single researcher can now carry the necessary apparatus in a rucksack, and the number of measured sites has grown accordingly, from a handful in the 1980s to several hundred today.\n\nParagraph C. Some of the most discussed results come from Neolithic chambered tombs in Ireland, Malta and the Orkney Islands. Several of these enclosed spaces were found to resonate strongly at frequencies close to 110 hertz — roughly the pitch of a low male voice. A number of investigators went further, reporting that exposure to sustained tones near this frequency produced measurable shifts in the brain activity of volunteers. The suggestion that Neolithic builders were deliberately engineering altered states of consciousness followed quickly, and was repeated in newspapers around the world. The original researchers were more cautious than their popular reception implied; most framed the neurological work as preliminary and declined to claim that the tombs had been tuned on purpose.\n\nParagraph D. That caution was well placed, because the measurements themselves rest on shakier ground than they first appear. Almost every monument now standing is a ruin. Roofs have collapsed, entrances have been enlarged for modern visitors, and interiors have been swept clean of the plaster, hides, timber and textiles that once lined them. Soft materials absorb sound; bare stone reflects it. A chamber that reverberates dramatically today may have been acoustically dead when it was in use. Critics point out, reasonably, that measuring a ruin tells us about the ruin, and that inferring the original experience requires assumptions that are rarely stated and almost never tested.\n\nParagraph E. A parallel line of enquiry has looked outdoors, at painted and engraved rock surfaces. Working in France, Spain and later in the American Southwest, researchers noticed that decorated panels seemed to cluster at points where the surrounding topography produces unusually strong echoes. This impression has since been subjected to statistical testing. In several study areas, the correlation between echo intensity and the presence of imagery survived comparison against randomly selected control points — a result that is difficult to explain by accident alone, though the size of the samples remains modest.\n\nParagraph F. Yet even a strong correlation leaves the central problem untouched. Prehistoric people left no written account of why they chose one rock face over another, and a preference for echoing places could arise for reasons that have nothing to do with the echo: such locations are often sheltered, or visually striking, or simply easier to reach. The difficulty is familiar to archaeologists working on any aspect of ancient cognition. Evidence of a pattern is not evidence of a purpose, and the more compelling a modern researcher finds an acoustic effect, the more reason there is to suspect that the significance is being supplied by the observer rather than recovered from the past.\n\nParagraph G. One response has been to stop measuring ruins and start rebuilding them, at least in software. Given an accurate survey of a monument, its likely original geometry and plausible estimates of how its surfaces absorbed sound, an acoustic model can predict how the intact structure would have behaved. Such models are only as good as their assumptions — the absorption values in particular are frequently guesswork — but they have one decisive advantage over fieldwork: the assumptions are explicit and can be varied. A researcher can ask what happens if the walls were hung with hides rather than left bare, and see whether the celebrated resonance survives. In several cases it has not.\n\nParagraph H. The discipline that has emerged from these arguments is more modest than its early publicity suggested, and more durable for it. Few practitioners now assert that any particular monument was tuned. What is increasingly accepted is a weaker but more defensible claim: that sound was part of how these places were experienced, that this dimension has been systematically overlooked, and that it can be investigated with the same standards of evidence applied elsewhere in archaeology. Whether the builders intended the effects may never be established. That the effects existed, and that people standing in those spaces heard them, is not seriously in doubt.",
+   qs:[
+     {type:"mcq",q:"Подбор заголовка к абзацу B. Выберите заголовок из списка.",opts:["Rebuilding the monument in software","A discovery that was overstated in the retelling","Why the discipline has abandoned fieldwork","Portable technology and a growing dataset","The difficulty of moving from pattern to purpose","Evidence from outside the chamber, put to the test","What survives of a building, and what does not","Disagreement about which frequencies matter most","Training musicians to recreate ancient sound"],a:3},
+     {type:"mcq",q:"Подбор заголовка к абзацу C. Выберите заголовок из списка.",opts:["Rebuilding the monument in software","A discovery that was overstated in the retelling","Why the discipline has abandoned fieldwork","Portable technology and a growing dataset","The difficulty of moving from pattern to purpose","Evidence from outside the chamber, put to the test","What survives of a building, and what does not","Disagreement about which frequencies matter most","Training musicians to recreate ancient sound"],a:1},
+     {type:"mcq",q:"Подбор заголовка к абзацу D. Выберите заголовок из списка.",opts:["Rebuilding the monument in software","A discovery that was overstated in the retelling","Why the discipline has abandoned fieldwork","Portable technology and a growing dataset","The difficulty of moving from pattern to purpose","Evidence from outside the chamber, put to the test","What survives of a building, and what does not","Disagreement about which frequencies matter most","Training musicians to recreate ancient sound"],a:6},
+     {type:"mcq",q:"Подбор заголовка к абзацу E. Выберите заголовок из списка.",opts:["Rebuilding the monument in software","A discovery that was overstated in the retelling","Why the discipline has abandoned fieldwork","Portable technology and a growing dataset","The difficulty of moving from pattern to purpose","Evidence from outside the chamber, put to the test","What survives of a building, and what does not","Disagreement about which frequencies matter most","Training musicians to recreate ancient sound"],a:5},
+     {type:"mcq",q:"Подбор заголовка к абзацу F. Выберите заголовок из списка.",opts:["Rebuilding the monument in software","A discovery that was overstated in the retelling","Why the discipline has abandoned fieldwork","Portable technology and a growing dataset","The difficulty of moving from pattern to purpose","Evidence from outside the chamber, put to the test","What survives of a building, and what does not","Disagreement about which frequencies matter most","Training musicians to recreate ancient sound"],a:4},
+     {type:"mcq",q:"Подбор заголовка к абзацу G. Выберите заголовок из списка.",opts:["Rebuilding the monument in software","A discovery that was overstated in the retelling","Why the discipline has abandoned fieldwork","Portable technology and a growing dataset","The difficulty of moving from pattern to purpose","Evidence from outside the chamber, put to the test","What survives of a building, and what does not","Disagreement about which frequencies matter most","Training musicians to recreate ancient sound"],a:0},
+     {type:"mcq",q:"Acoustic archaeology has been a recognised area of study for over a century.",opts:["True","False","Not Given"],a:1},
+     {type:"mcq",q:"The researchers who first reported the 110 hertz resonance stated that the tombs had been tuned intentionally.",opts:["True","False","Not Given"],a:1},
+     {type:"mcq",q:"Rock art sites have been studied acoustically in a greater number of countries than chambered tombs.",opts:["True","False","Not Given"],a:2},
+     {type:"mcq",q:"Acoustic models of monuments depend in part on estimated values.",opts:["True","False","Not Given"],a:0},
+     {type:"gap",q:"Ruined monuments no longer contain the ___ materials — plaster, hides, timber and textiles — that once lined their interiors.",a:["soft"]},
+     {type:"gap",q:"Such materials absorb sound, while bare ___ reflects it.",a:["stone"]},
+     {type:"gap",q:"One response is to build an acoustic ___ of the intact building using software.",a:["model"]},
+     {type:"gap",q:"The absorption values used in these models are often described as little more than ___.",a:["guesswork"]}
    ]}
 ];
 
@@ -535,7 +620,17 @@ const WRITING_TASK2 = [
   "Some people think that children should begin learning a foreign language at primary school, while others believe it is better to wait until secondary school. Discuss both views and give your opinion.",
   "Many people believe that social media has a negative effect on the way people communicate with each other. To what extent do you agree or disagree?",
   "Some people think governments should spend money on public transportation, while others believe the money should be spent on building more roads. Discuss both views and give your own opinion.",
-  "In many countries, more and more people are choosing to work from home. Do the advantages of this outweigh the disadvantages?"
+  "In many countries, more and more people are choosing to work from home. Do the advantages of this outweigh the disadvantages?",
+  "There are many different types of music in the world today. Why do we need music? Is the traditional music of a country more important than the international music that is heard everywhere nowadays?",
+  "Should wealthy nations be required to share their wealth among poorer nations by providing such things as food and education? Or is it the responsibility of the governments of poorer nations to look after their citizens themselves?",
+  "News editors decide what to broadcast on television and what to print in newspapers. What factors do you think influence these decisions? Do we become used to bad news? Would it be better if more good news was reported?",
+  "The idea of having a single career is becoming an old-fashioned one. The new fashion will be to have several careers or ways of earning money, and further education will be something that continues throughout life. To what extent do you agree or disagree?",
+  "We are becoming increasingly dependent on computers. They are used in business, hospitals, crime detection and even to fly planes. What things will they be used for in the future? Is this dependence on computers a good thing, or should we be more suspicious of their benefits?",
+  // Хранилище 19 — темы Writing Task 2 (короткие формулировки задания, без текстов passages/answer key/sample essays)
+  "Some people think that competition at work, at school and in daily life is a good thing. Others believe that we should try to cooperate more, rather than competing against each other. Discuss both these views and give your own opinion.",
+  "The working week should be shorter and workers should have a longer weekend. Do you agree or disagree?",
+  "It is important for everyone, including young people, to save money for their future. To what extent do you agree or disagree with this statement?",
+  "In many countries nowadays, consumers can go to a supermarket and buy food produced all over the world. Do you think this is a positive or negative development?"
 ];
 
 const WRITING_TASK1 = [
@@ -553,13 +648,27 @@ const SPEAKING_PART1 = [
   "How do you usually spend your weekends?",
   "Tell me about a hobby that you find interesting.",
   "What kind of food do you like, and why?",
-  "Do you prefer travelling by plane, train, or car? Why?"
+  "Do you prefer travelling by plane, train, or car? Why?",
+  // Хранилище 19 — примеры вступительных вопросов Part 1
+  "Do you have a favourite café? Why/Why not?",
+  "Do you prefer spending holidays with friends or with family? Why?",
+  "Can you find food from many different countries where you live? Why/Why not?",
+  "Have you travelled a lot by plane? To where?/Why not?"
 ];
 
 const SPEAKING_PART2 = [
   {topic:"Describe a person who has influenced you.",bullets:["Who this person is","How you know them","What qualities they have","Explain why they have influenced you"]},
   {topic:"Describe a place you visited that you found interesting.",bullets:["Where it is","When you went there","What you did there","Explain why you found it interesting"]},
-  {topic:"Describe a skill you would like to learn.",bullets:["What the skill is","Why you want to learn it","How you would learn it","Explain how it would help you"]}
+  {topic:"Describe a skill you would like to learn.",bullets:["What the skill is","Why you want to learn it","How you would learn it","Explain how it would help you"]},
+  {topic:"University Clubs and Associations — you've just arrived at a new university and want to know about the clubs you can join.",label:"Ask the examiner about:",bullets:["Types of clubs","Meeting times","Benefits","Costs"]},
+  {topic:"Asking for an Extension — you need two more weeks for an assignment because you've had trouble getting the reference books. Your examiner is your lecturer.",label:"Ask the examiner about:",bullets:["Regulations regarding late work","Possibility of having more time","Different sources for books/information","Assistance with writing for overseas students"]},
+  {topic:"The Public Holiday — there's soon to be a public holiday in your examiner's country and you want to find out about it.",label:"Ask the examiner about:",bullets:["The name of the public holiday","The significance of the holiday","Availability of services on the day (banks/shops/cinemas)","Things for visitors to do","How they plan to spend the day"]},
+  {topic:"The Excursion — the Overseas Students' Club is organising an excursion to a local tourist spot and you're thinking of joining.",label:"Ask the examiner about:",bullets:["Destination","Means of transport","Length of excursion","Cost","Meals","Clothing/equipment"]},
+  // Хранилище 19 — cue cards Part 2 (короткие формулировки задания)
+  {topic:"Describe a law that was introduced in your country that you thought was a very good idea.",bullets:["What the law was","Who introduced it","When and why it was introduced","Explain why you thought this law was such a good idea"]},
+  {topic:"Describe a person from your country who has won a prize, award or medal.",bullets:["Who this person is","Which prize, award or medal they received","What they did to win this","Explain whether you think it was right that this person received this prize, award or medal"]},
+  {topic:"Describe a car journey you made that took longer than expected.",bullets:["Where you were going","Who you were with","How you felt during the journey","Explain why this car journey took longer than expected"]},
+  {topic:"Describe a place you visited that has beautiful views.",bullets:["Where this place is","When and why you visited it","What views you can see from this place","Explain why you think these views are so beautiful"]}
 ];
 
 /* ---------- 30-day plan ---------- */
@@ -696,8 +805,53 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{
     document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById('view-'+btn.dataset.view).classList.add('active');
+    if(btn.dataset.view === 'leaderboard') loadLeaderboard();
   });
 });
+
+function escapeHtml(s){
+  return String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ---------- leaderboard ---------- */
+async function updateLeaderboardScore(overallBand, sessions){
+  if(!currentUser) return;
+  const rawName = (currentUser.user_metadata && currentUser.user_metadata.username) || (currentUser.email||'').split('@')[0] || 'Аноним';
+  const username = rawName.slice(0, 40);
+  try{
+    const { error } = await sb.from('leaderboard').upsert({
+      user_id: currentUser.id,
+      username,
+      overall_band: overallBand,
+      sessions,
+      updated_at: new Date().toISOString()
+    });
+    if(error) throw error;
+  }catch(e){ console.error('leaderboard update failed', e); }
+}
+
+async function loadLeaderboard(){
+  const listEl = document.getElementById('leaderboardList');
+  listEl.innerHTML = '<div class="empty-note">Загрузка…</div>';
+  try{
+    const { data: rows, error } = await sb.from('leaderboard')
+      .select('user_id, username, overall_band, sessions')
+      .order('overall_band', { ascending:false, nullsFirst:false })
+      .limit(100);
+    if(error) throw error;
+    if(!rows || !rows.length){ listEl.innerHTML = '<div class="empty-note">Пока никто не набрал баллов — начните практику, чтобы попасть в рейтинг.</div>'; return; }
+    listEl.innerHTML = rows.map((r,i)=>`
+      <div class="leaderboard-row${currentUser && r.user_id===currentUser.id ? ' me' : ''}">
+        <span class="lb-rank">#${i+1}</span>
+        <span class="lb-name">${escapeHtml(r.username)}${currentUser && r.user_id===currentUser.id ? ' (вы)' : ''}</span>
+        <span class="lb-band mono">${r.overall_band!=null ? Number(r.overall_band).toFixed(1) : '—'}</span>
+        <span class="lb-sessions mono">${r.sessions||0} сесс.</span>
+      </div>`).join('');
+  }catch(e){
+    listEl.innerHTML = '<div class="empty-note">Не удалось загрузить рейтинг.</div>';
+    console.error('leaderboard load failed', e);
+  }
+}
 
 /* ---------- dashboard render ---------- */
 function renderDashboard(){
@@ -736,6 +890,10 @@ function renderDashboard(){
     }
   }
   document.getElementById('statStreak').textContent = streak;
+  const streakBadge = document.getElementById('streakBadge');
+  streakBadge.textContent = '🔥 ' + streak;
+  streakBadge.classList.toggle('cold', streak===0);
+  updateLeaderboardScore(overall, totalSessions);
 
   // route map
   const routeRows = document.getElementById('routeRows');
@@ -858,11 +1016,24 @@ function newReading(idx){
   document.getElementById('rPick').value = READING_BANK.indexOf(currentReading);
   document.getElementById('rTag').textContent = 'READING · ' + currentReading.qtype;
   document.getElementById('rTitle').textContent = currentReading.title;
-  document.getElementById('rPassage').textContent = currentReading.passage;
+  document.getElementById('rPassage').innerHTML = wrapClickableWords(currentReading.passage);
+  document.getElementById('rWordCard').style.display = 'none';
   document.getElementById('rQuestions').innerHTML = renderQBlock(currentReading.qs, 'r');
   document.getElementById('rResult').innerHTML = '';
   document.getElementById('rSubmit').disabled = false;
 }
+function wrapClickableWords(text){
+  return text.replace(/[A-Za-z][A-Za-z'-]*|[^A-Za-z]+/g, tok => {
+    if(/^[A-Za-z]/.test(tok)){
+      return `<span class="word-click" data-word="${tok.toLowerCase()}">${escapeHtml(tok)}</span>`;
+    }
+    return escapeHtml(tok);
+  });
+}
+document.getElementById('rPassage').addEventListener('click', e=>{
+  const el = e.target.closest('.word-click');
+  if(el) translateWord(el.dataset.word);
+});
 function pickR(i,j){
   rAnswers[i]=j;
   currentReading.qs[i].opts.forEach((_,k)=>{
@@ -944,7 +1115,7 @@ function setSpeakMode(m){
 }
 function renderCue(i){
   const c = SPEAKING_PART2[i];
-  document.getElementById('sCue').innerHTML = `<b>${c.topic}</b><br>You should say:<br>` + c.bullets.map(b=>`• ${b}`).join('<br>');
+  document.getElementById('sCue').innerHTML = `<b>${c.topic}</b><br>${c.label || 'You should say:'}<br>` + c.bullets.map(b=>`• ${b}`).join('<br>');
 }
 document.getElementById('sPrompt').addEventListener('change', e=>{
   if(speakMode===2) renderCue(e.target.value);
@@ -960,6 +1131,54 @@ document.getElementById('sText').addEventListener('input', e=>{
   document.getElementById('sCount').textContent = e.target.value.trim().split(/\s+/).filter(Boolean).length;
 });
 
+/* ---------- voice input (Speaking) ---------- */
+let micRecognizer = null, micActive = false, micBaseText = '';
+function toggleMic(){
+  const statusEl = document.getElementById('micStatus');
+  const btnEl = document.getElementById('micBtn');
+  if(micActive){ micRecognizer.stop(); return; }
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SpeechRec){
+    statusEl.textContent = 'Голосовой ввод не поддерживается этим браузером — попробуйте Chrome или Edge.';
+    return;
+  }
+  const textEl = document.getElementById('sText');
+  micBaseText = textEl.value.trim() ? textEl.value.trim() + ' ' : '';
+  micRecognizer = new SpeechRec();
+  micRecognizer.lang = 'en-US';
+  micRecognizer.continuous = true;
+  micRecognizer.interimResults = true;
+  micRecognizer.onstart = ()=>{
+    micActive = true;
+    btnEl.textContent = '⏹ Остановить запись';
+    btnEl.classList.add('mic-active');
+    statusEl.textContent = 'Слушаю… говорите по-английски.';
+  };
+  micRecognizer.onresult = (e)=>{
+    let finalT = '', interimT = '';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      const r = e.results[i];
+      if(r.isFinal) finalT += r[0].transcript;
+      else interimT += r[0].transcript;
+    }
+    if(finalT) micBaseText += finalT.trim() + ' ';
+    textEl.value = micBaseText + interimT;
+    textEl.dispatchEvent(new Event('input'));
+  };
+  micRecognizer.onerror = (e)=>{
+    statusEl.textContent = e.error === 'not-allowed'
+      ? 'Доступ к микрофону запрещён — разрешите его в настройках браузера.'
+      : 'Ошибка распознавания: ' + e.error;
+  };
+  micRecognizer.onend = ()=>{
+    micActive = false;
+    btnEl.textContent = '🎤 Говорить в микрофон';
+    btnEl.classList.remove('mic-active');
+  };
+  try{ micRecognizer.start(); }
+  catch(e){ statusEl.textContent = 'Не удалось запустить запись.'; }
+}
+
 async function gradeWithAI(systemPrompt, userText){
   const { data: { session } } = await sb.auth.getSession();
   if(!session) throw new Error('Не авторизован');
@@ -973,6 +1192,34 @@ async function gradeWithAI(systemPrompt, userText){
   const text = (json.content||[]).map(c=>c.text||'').join('\n');
   const clean = text.replace(/```json|```/g,'').trim();
   return JSON.parse(clean);
+}
+
+async function requestAiHelp(mode){
+  const textEl = document.getElementById(mode==='writing' ? 'wText' : 'sText');
+  const hintsEl = document.getElementById(mode==='writing' ? 'wHints' : 'sHints');
+  const btnEl = document.getElementById(mode==='writing' ? 'wHintBtn' : 'sHintBtn');
+  const text = textEl.value.trim();
+  if(!text){ hintsEl.innerHTML = '<div class="result-line" style="color:var(--red)">Сначала напишите хотя бы пару предложений.</div>'; return; }
+  btnEl.disabled = true;
+  hintsEl.innerHTML = '<div class="loading">AI подбирает подсказки...</div>';
+  try{
+    const { data: { session } } = await sb.auth.getSession();
+    if(!session) throw new Error('Не авторизован');
+    const response = await fetch('/api/assist', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json', 'Authorization':'Bearer '+session.access_token},
+      body: JSON.stringify({ mode, text })
+    });
+    if(!response.ok){
+      const err = await response.json().catch(()=>({}));
+      throw new Error(err.error || ('Ошибка (' + response.status + ')'));
+    }
+    const json = await response.json();
+    hintsEl.innerHTML = `<div class="result-line" style="white-space:pre-wrap;">${escapeHtml(json.tips||'Подсказок нет.')}</div>`;
+  }catch(e){
+    hintsEl.innerHTML = `<div class="result-line" style="color:var(--red)">${escapeHtml(e.message||'Не удалось получить подсказки.')}</div>`;
+  }
+  btnEl.disabled = false;
 }
 
 async function submitWriting(){
@@ -1041,38 +1288,81 @@ async function submitSpeaking(){
 }
 
 /* ---------- VOCABULARY ---------- */
+async function translateToRu(word){
+  try{
+    const res = await fetch('https://api.mymemory.translated.net/get?q='+encodeURIComponent(word)+'&langpair=en|ru');
+    if(!res.ok) return '';
+    const json = await res.json();
+    return (json.responseData && json.responseData.translatedText) || '';
+  }catch(e){ return ''; }
+}
+
 async function lookupWord(){
   const word = document.getElementById('vWord').value.trim().toLowerCase();
   const el = document.getElementById('vResult');
   if(!word){ el.innerHTML=''; return; }
   el.innerHTML = '<div class="loading">Ищу в словаре...</div>';
   try{
-    const res = await fetch('https://api.dictionaryapi.dev/api/v2/entries/en/'+encodeURIComponent(word));
-    if(!res.ok) throw new Error('not found');
-    const arr = await res.json();
+    const [defRes, translation] = await Promise.all([
+      fetch('https://api.dictionaryapi.dev/api/v2/entries/en/'+encodeURIComponent(word)),
+      translateToRu(word)
+    ]);
+    if(!defRes.ok) throw new Error('not found');
+    const arr = await defRes.json();
     const entry = arr[0];
     const phonetic = entry.phonetic || (entry.phonetics.find(p=>p.text)||{}).text || '';
     const audioObj = entry.phonetics.find(p=>p.audio);
     const audio = audioObj ? audioObj.audio : '';
+    const def = entry.meanings[0].definitions[0].definition || '';
     let html = `<div class="feedback-box" style="border-left-color:var(--teal);">
       <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;">
-        <span style="font-family:'Fraunces',serif;font-size:24px;font-weight:600;">${entry.word}</span>
-        ${phonetic?`<span class="mono" style="color:var(--ink-soft);">${phonetic}</span>`:''}
+        <span style="font-family:'Fraunces',serif;font-size:24px;font-weight:600;">${escapeHtml(entry.word)}</span>
+        ${phonetic?`<span class="mono" style="color:var(--ink-soft);">${escapeHtml(phonetic)}</span>`:''}
+        ${translation?`<span class="mono" style="color:var(--gold);font-weight:600;">${escapeHtml(translation)}</span>`:''}
         ${audio?`<button class="btn secondary" style="padding:4px 12px;font-size:12px;" onclick="new Audio('${audio}').play()">🔊</button>`:''}
-        <button class="btn" style="padding:4px 12px;font-size:12px;margin-left:auto;" onclick='saveWord(${JSON.stringify(JSON.stringify({word:entry.word,def:(entry.meanings[0].definitions[0].definition||"")}))})'>+ Сохранить</button>
+        <button class="btn" style="padding:4px 12px;font-size:12px;margin-left:auto;" onclick='saveWord(${JSON.stringify(JSON.stringify({word:entry.word,def,tr:translation||""}))})'>+ Сохранить</button>
       </div>`;
     entry.meanings.slice(0,3).forEach(m=>{
-      html += `<h4>${m.partOfSpeech}</h4>`;
+      html += `<h4>${escapeHtml(m.partOfSpeech)}</h4>`;
       m.definitions.slice(0,2).forEach(d=>{
-        html += `<p style="margin:2px 0;">• ${d.definition}${d.example?`<br><span style="font-style:italic;color:var(--ink-soft);">"${d.example}"</span>`:''}</p>`;
+        html += `<p style="margin:2px 0;">• ${escapeHtml(d.definition)}${d.example?`<br><span style="font-style:italic;color:var(--ink-soft);">"${escapeHtml(d.example)}"</span>`:''}</p>`;
       });
-      if(m.synonyms && m.synonyms.length) html += `<p style="font-size:12.5px;color:var(--teal);">синонимы: ${m.synonyms.slice(0,6).join(', ')}</p>`;
+      if(m.synonyms && m.synonyms.length) html += `<p style="font-size:12.5px;color:var(--teal);">синонимы: ${escapeHtml(m.synonyms.slice(0,6).join(', '))}</p>`;
     });
-    html += `<p style="font-size:11px;color:var(--ink-soft);margin-top:10px;">Источник: Free Dictionary API (Wiktionary / public domain)</p></div>`;
+    html += `<p style="font-size:11px;color:var(--ink-soft);margin-top:10px;">Источник: Free Dictionary API (Wiktionary / public domain) + MyMemory (перевод)</p></div>`;
     el.innerHTML = html;
   }catch(e){
     el.innerHTML = '<div class="result-line" style="color:var(--red)">Слово не найдено. Проверьте написание.</div>';
   }
+}
+
+async function translateWord(word){
+  const card = document.getElementById('rWordCard');
+  card.style.display = 'block';
+  card.innerHTML = '<div class="loading">Перевожу…</div>';
+  const [translation, def] = await Promise.all([
+    translateToRu(word),
+    fetch('https://api.dictionaryapi.dev/api/v2/entries/en/'+encodeURIComponent(word))
+      .then(r=> r.ok ? r.json() : null)
+      .then(arr=> arr ? (arr[0].meanings[0].definitions[0].definition||'') : '')
+      .catch(()=>'')
+  ]);
+  const already = (data.vocab||[]).some(v=>v.word===word);
+  card.innerHTML = `<div class="feedback-box" style="border-left-color:var(--gold);">
+    <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;">
+      <span style="font-family:'Fraunces',serif;font-size:20px;font-weight:600;">${escapeHtml(word)}</span>
+      ${translation?`<span class="mono" style="color:var(--gold);font-weight:600;">${escapeHtml(translation)}</span>`:'<span style="color:var(--ink-soft);font-size:12.5px;">перевод не найден</span>'}
+      <button class="btn secondary" style="padding:3px 8px;font-size:11px;margin-left:auto;" onclick="document.getElementById('rWordCard').style.display='none'">✕</button>
+    </div>
+    ${def?`<p style="margin:6px 0 0;font-size:13px;color:var(--ink-soft);">${escapeHtml(def)}</p>`:''}
+    <button class="btn" id="rWordSaveBtn" style="padding:4px 12px;font-size:12px;margin-top:8px;" ${already?'disabled':''} onclick='saveWordFromCard(${JSON.stringify(JSON.stringify({word,def,tr:translation||""}))})'>${already?'✓ Уже в словаре':'+ Сохранить в словарь'}</button>
+  </div>`;
+}
+
+async function saveWordFromCard(payload){
+  await saveWord(payload);
+  const btn = document.getElementById('rWordSaveBtn');
+  if(btn){ btn.disabled = true; btn.textContent = '✓ Уже в словаре'; }
 }
 
 async function saveWord(payload){
@@ -1093,11 +1383,56 @@ function renderVocab(){
   const el = document.getElementById('vSaved');
   const list = data.vocab||[];
   document.getElementById('vCount').textContent = list.length? '('+list.length+')' : '';
-  if(!list.length){ el.innerHTML = '<div class="empty-note">Пока пусто — найдите слово и нажмите «Сохранить».</div>'; return; }
+  document.getElementById('vReviewBtn').disabled = !list.length;
+  if(!list.length){ el.innerHTML = '<div class="empty-note">Пока пусто — найдите слово или кликните по слову в тексте Reading и нажмите «Сохранить».</div>'; return; }
   el.innerHTML = list.map(v=>`<div style="border-top:1px solid var(--line);padding:9px 0;display:flex;gap:10px;align-items:flex-start;">
-    <div style="flex:1;"><b>${v.word}</b> — <span style="color:var(--ink-soft);font-size:13.5px;">${v.def}</span></div>
+    <div style="flex:1;"><b>${escapeHtml(v.word)}</b>${v.tr?` <span style="color:var(--gold);font-weight:600;">— ${escapeHtml(v.tr)}</span>`:''}<br><span style="color:var(--ink-soft);font-size:13.5px;">${escapeHtml(v.def||'')}</span></div>
     <button class="btn secondary" style="padding:2px 10px;font-size:12px;" onclick="removeWord('${v.word.replace(/'/g,"\\'")}')">✕</button>
   </div>`).join('');
+}
+
+/* ---------- vocabulary review (spaced repeat, simple shuffle) ---------- */
+let reviewQueue = [], reviewIdx = 0, reviewRevealed = false;
+function startReview(){
+  const list = data.vocab||[];
+  if(!list.length) return;
+  reviewQueue = [...list].sort(()=>Math.random()-0.5);
+  reviewIdx = 0;
+  reviewRevealed = false;
+  document.getElementById('vReviewCard').style.display = 'block';
+  renderReviewCard();
+  document.getElementById('vReviewCard').scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+function renderReviewCard(){
+  const body = document.getElementById('vReviewBody');
+  if(reviewIdx >= reviewQueue.length){
+    body.innerHTML = `<p>Повторили все слова (${reviewQueue.length}). 👏</p><button class="btn secondary" onclick="document.getElementById('vReviewCard').style.display='none'">Закрыть</button>`;
+    return;
+  }
+  const v = reviewQueue[reviewIdx];
+  body.innerHTML = `
+    <div style="font-family:'Fraunces',serif;font-size:24px;font-weight:600;margin-bottom:10px;">${escapeHtml(v.word)}</div>
+    ${reviewRevealed
+      ? `<p style="color:var(--gold);font-weight:600;font-size:16px;">${escapeHtml(v.tr||'перевод не сохранён')}</p>
+         <p style="font-size:13px;color:var(--ink-soft);">${escapeHtml(v.def||'')}</p>
+         <div class="btn-row" style="margin-top:12px;">
+           <button class="btn secondary" onclick="reviewForget('${v.word.replace(/'/g,"\\'")}')">Забыл, убрать из словаря</button>
+           <button class="btn" onclick="nextReview()">Дальше →</button>
+         </div>`
+      : `<button class="btn" onclick="revealReview()">Показать перевод</button>`
+    }
+    <div style="font-size:12px;color:var(--ink-soft);margin-top:12px;">${reviewIdx+1} / ${reviewQueue.length}</div>
+  `;
+}
+function revealReview(){ reviewRevealed = true; renderReviewCard(); }
+function nextReview(){ reviewIdx++; reviewRevealed = false; renderReviewCard(); }
+async function reviewForget(word){
+  data.vocab = (data.vocab||[]).filter(v=>v.word!==word);
+  reviewQueue.splice(reviewIdx,1);
+  reviewRevealed = false;
+  await saveData();
+  renderVocab();
+  renderReviewCard();
 }
 
 /* ---------- init ---------- */
