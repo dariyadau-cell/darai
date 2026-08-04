@@ -5,19 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DarAI</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rethink+Sans:wght@400..800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
 :root{
-  --ink:#1B2A4A;
-  --ink-soft:#4A5A78;
-  --paper:#EEF1EC;
+  --ink:#0E1116;
+  --ink-soft:#6B7280;
+  --paper:#F4F5F7;
   --card:#FFFFFF;
-  --gold:#B8873A;
-  --gold-soft:#E9D9B8;
-  --teal:#3C7A6E;
-  --teal-soft:#D9E8E4;
-  --red:#B4483C;
-  --line:#D8DCD3;
+  --gold:#1D6B6C;
+  --gold-soft:#DCEEEC;
+  --teal:#0A66C2;
+  --teal-soft:#DDEAFA;
+  --red:#E5484D;
+  --line:#E6E8EC;
+  --shadow:0 18px 40px -24px rgba(14,17,22,.22);
+  --shadow-sm:0 8px 20px -14px rgba(14,17,22,.25);
 }
 *{box-sizing:border-box;}
 body{
@@ -27,21 +29,21 @@ body{
   font-family:'Inter',sans-serif;
   -webkit-font-smoothing:antialiased;
 }
-h1,h2,h3{font-family:'Fraunces',serif;margin:0;letter-spacing:-0.01em;}
+h1,h2,h3{font-family:'Rethink Sans',sans-serif;margin:0;font-weight:700;letter-spacing:-0.02em;}
 .mono{font-family:'IBM Plex Mono',monospace;}
-.wrap{max-width:980px;margin:0 auto;padding:28px 20px 80px;}
+.wrap{max-width:1040px;margin:0 auto;padding:28px 20px 80px;}
 
 /* header */
 header.top{
   display:flex;justify-content:space-between;align-items:flex-end;
-  border-bottom:2px solid var(--ink);
+  border-bottom:1px solid var(--line);
   padding-bottom:16px;margin-bottom:28px;
 }
 .brand{display:flex;align-items:baseline;gap:10px;}
-.brand h1{font-size:26px;font-weight:600;}
+.brand h1{font-size:24px;font-weight:800;letter-spacing:-.02em;}
 .brand .stamp{
-  font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--gold);
-  border:1px solid var(--gold);border-radius:3px;padding:2px 6px;letter-spacing:.06em;
+  font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:500;color:var(--ink-soft);
+  border:1px solid var(--line);border-radius:20px;padding:3px 9px;letter-spacing:.1em;text-transform:uppercase;
 }
 .target-pill{
   font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--ink-soft);
@@ -61,7 +63,7 @@ header.top{
   border-bottom:1px solid var(--line);
 }
 .leaderboard-row:last-child{border-bottom:none;}
-.leaderboard-row.me{background:var(--gold-soft);border-radius:8px;padding-left:10px;padding-right:10px;}
+.leaderboard-row.me{background:var(--gold-soft);border-radius:12px;padding-left:10px;padding-right:10px;}
 .lb-rank{width:26px;font-family:'IBM Plex Mono',monospace;font-weight:600;color:var(--ink-soft);}
 .lb-name{flex:1;font-weight:600;}
 .lb-band{width:50px;text-align:right;font-weight:600;color:var(--gold);}
@@ -82,11 +84,20 @@ nav.tabs button.active{background:var(--ink);border-color:var(--ink);color:var(-
 
 /* route map */
 .route-card{
-  background:var(--ink);color:var(--paper);border-radius:14px;
+  position:relative;overflow:hidden;
+  background:radial-gradient(120% 140% at 15% -10%,#1c7fd6 0%,#0a4f97 42%,#0a1930 100%);
+  color:var(--paper);border-radius:20px;
   padding:26px 24px 20px;margin-bottom:24px;
+  box-shadow:var(--shadow);
 }
-.route-card h2{color:#fff;font-size:19px;margin-bottom:2px;}
-.route-sub{color:#9FB0C9;font-size:13px;margin-bottom:18px;}
+.route-card::before{
+  content:'';position:absolute;inset:-20% -10% auto auto;width:60%;height:70%;
+  background:radial-gradient(closest-side,rgba(29,107,108,.35),transparent 72%);
+  pointer-events:none;z-index:0;
+}
+.route-card>*{position:relative;z-index:1;}
+.route-card h2{color:#fff;font-size:20px;font-weight:800;margin-bottom:2px;position:relative;}
+.route-sub{color:#B7CDEA;font-size:13px;margin-bottom:18px;position:relative;}
 .route-row{display:flex;align-items:center;gap:14px;margin-bottom:16px;}
 .route-row:last-child{margin-bottom:0;}
 .route-label{width:88px;font-size:12.5px;font-weight:600;color:#C8D3E4;flex-shrink:0;}
@@ -118,22 +129,24 @@ nav.tabs button.active{background:var(--ink);border-color:var(--ink);color:var(-
 .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
 @media(max-width:720px){.grid4{grid-template-columns:repeat(2,1fr);}}
 .skill-card{
-  background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;
+  background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;
+  box-shadow:var(--shadow-sm);transition:transform .15s ease,box-shadow .15s ease;
 }
-.skill-card .sname{font-size:12.5px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em;}
-.skill-card .sband{font-family:'Fraunces',serif;font-size:34px;font-weight:600;margin:4px 0 2px;}
+.skill-card:hover{transform:translateY(-2px);box-shadow:var(--shadow);}
+.skill-card .sname{font-size:11.5px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.08em;}
+.skill-card .sband{font-family:'Rethink Sans',sans-serif;font-size:32px;font-weight:800;letter-spacing:-.02em;margin:4px 0 2px;}
 .skill-card .scount{font-size:11.5px;color:var(--ink-soft);}
 
 .stats-row{display:flex;gap:14px;margin-bottom:24px;flex-wrap:wrap;}
 .stat-box{
   flex:1;min-width:140px;background:var(--card);border:1px solid var(--line);
-  border-radius:12px;padding:16px;
+  border-radius:16px;padding:16px;box-shadow:var(--shadow-sm);
 }
-.stat-box .slabel{font-size:11.5px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em;}
+.stat-box .slabel{font-size:11px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.08em;}
 .stat-box .sval{font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:600;margin-top:4px;}
 
-.history-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;}
-.history-card h3{font-size:16px;margin-bottom:14px;}
+.history-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow-sm);}
+.history-card h3{font-size:16px;margin-bottom:14px;font-weight:700;}
 .bars{display:flex;align-items:flex-end;gap:8px;height:120px;}
 .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;}
 .bar-fill{width:100%;border-radius:4px 4px 0 0;background:var(--teal);min-height:3px;}
@@ -141,13 +154,14 @@ nav.tabs button.active{background:var(--ink);border-color:var(--ink);color:var(-
 .empty-note{color:var(--ink-soft);font-size:13.5px;padding:20px 0;text-align:center;}
 
 /* practice */
-.practice-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:22px;margin-bottom:18px;}
-.practice-card h3{font-size:18px;margin-bottom:6px;}
+.practice-card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px;margin-bottom:18px;box-shadow:var(--shadow-sm);}
+.practice-card h3{font-size:19px;font-weight:800;letter-spacing:-.01em;margin-bottom:6px;}
 .tag{
-  display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:10.5px;
-  background:var(--gold-soft);color:#7A5A20;padding:2px 8px;border-radius:10px;margin-bottom:10px;
+  display:inline-flex;align-items:center;gap:7px;font-family:'IBM Plex Mono',monospace;font-weight:500;font-size:11px;
+  color:var(--ink-soft);letter-spacing:.14em;text-transform:uppercase;padding:0;margin-bottom:12px;
 }
-.passage{background:var(--paper);border-radius:8px;padding:14px 16px;font-size:14.5px;line-height:1.6;margin:12px 0;white-space:pre-line;}
+.tag::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--gold);flex:none;}
+.passage{background:var(--paper);border-radius:12px;padding:14px 16px;font-size:14.5px;line-height:1.6;margin:12px 0;white-space:pre-line;}
 .word-click{cursor:pointer;border-radius:3px;transition:.1s;}
 .word-click:hover{background:var(--gold-soft);}
 
@@ -155,64 +169,82 @@ nav.tabs button.active{background:var(--ink);border-color:var(--ink);color:var(-
 @keyframes mic-pulse{0%,100%{opacity:1;}50%{opacity:.65;}}
 .gap-input{
   width:auto;min-width:160px;display:inline-block;border:1.5px solid var(--line);
-  border-radius:6px;padding:6px 10px;font-size:14px;font-family:'Inter',sans-serif;
+  border-radius:9px;padding:6px 10px;font-size:14px;font-family:'Inter',sans-serif;transition:.12s;
 }
 .gap-input.correct{border-color:var(--teal);background:var(--teal-soft);}
-.gap-input.wrong{border-color:var(--red);background:#F5E2DF;}
+.gap-input.wrong{border-color:var(--red);background:#FBE4E5;}
 .q-block{margin:16px 0;}
 .q-block p{font-weight:600;font-size:14.5px;margin-bottom:8px;}
 .q-opt{
   display:block;width:100%;text-align:left;background:var(--card);border:1.5px solid var(--line);
-  border-radius:8px;padding:9px 12px;margin-bottom:6px;cursor:pointer;font-size:14px;font-family:'Inter',sans-serif;
-  transition:.12s;
+  border-radius:11px;padding:10px 13px;margin-bottom:7px;cursor:pointer;font-size:14px;font-family:'Inter',sans-serif;
+  transition:.14s;
 }
 .q-opt:hover{border-color:var(--ink-soft);}
 .q-opt.selected{border-color:var(--ink);background:var(--paper);font-weight:600;}
 .q-opt.correct{border-color:var(--teal);background:var(--teal-soft);}
-.q-opt.wrong{border-color:var(--red);background:#F5E2DF;}
+.q-opt.wrong{border-color:var(--red);background:#FBE4E5;}
 
 .btn{
+  display:inline-flex;align-items:center;gap:8px;
   font-family:'Inter',sans-serif;font-weight:600;font-size:14px;
-  background:var(--ink);color:#fff;border:none;border-radius:8px;
-  padding:11px 20px;cursor:pointer;transition:.15s;
+  background:var(--ink);color:#fff;border:none;border-radius:11px;
+  padding:11px 20px;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease,background .15s ease;
+  box-shadow:0 10px 24px -14px rgba(14,17,22,.5);
 }
-.btn:hover{background:#111D38;}
-.btn.secondary{background:transparent;color:var(--ink);border:1.5px solid var(--ink);}
-.btn:disabled{opacity:.45;cursor:not-allowed;}
+.btn:hover{background:#1a1f29;transform:translateY(-1px);}
+.btn.secondary{background:transparent;color:var(--ink);border:1.5px solid var(--line);box-shadow:none;}
+.btn.secondary:hover{border-color:var(--ink);background:var(--paper);transform:translateY(-1px);}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none;}
 .btn-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:14px;}
 
 select, textarea{
   width:100%;font-family:'Inter',sans-serif;font-size:14px;border:1.5px solid var(--line);
-  border-radius:8px;padding:10px 12px;background:var(--card);color:var(--ink);
+  border-radius:10px;padding:10px 12px;background:var(--card);color:var(--ink);transition:border-color .12s;
 }
+select:focus, textarea:focus{outline:none;border-color:var(--teal);}
 textarea{min-height:180px;resize:vertical;line-height:1.55;}
 .wordcount{font-size:12px;color:var(--ink-soft);margin-top:6px;font-family:'IBM Plex Mono',monospace;}
 
 .feedback-box{
-  background:var(--paper);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;
+  background:var(--paper);border-left:3px solid var(--gold);border-radius:0 12px 12px 0;
   padding:16px 18px;margin-top:16px;font-size:14px;line-height:1.6;
 }
-.feedback-box .fband{font-family:'Fraunces',serif;font-size:26px;font-weight:600;color:var(--ink);}
-.feedback-box h4{font-size:12.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-soft);margin:12px 0 4px;}
+.feedback-box .fband{font-family:'Rethink Sans',sans-serif;font-size:26px;font-weight:800;color:var(--ink);}
+.feedback-box h4{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-soft);margin:12px 0 4px;}
 .loading{color:var(--ink-soft);font-size:13.5px;font-style:italic;}
 .result-line{font-size:13.5px;margin-top:10px;font-weight:600;}
 
 /* auth */
 .auth-overlay{
-  position:fixed;inset:0;background:var(--paper);z-index:1000;
+  position:fixed;inset:0;z-index:1000;
+  background:radial-gradient(120% 100% at 18% -10%,#1c7fd6 0%,#0a4f97 38%,#0a1930 78%,#080f1e 100%);
   display:flex;align-items:center;justify-content:center;padding:20px;
+  overflow:hidden;
+}
+.auth-overlay::before{
+  content:'';position:absolute;inset:-15% -10% auto auto;width:55%;height:60%;
+  background:radial-gradient(closest-side,rgba(29,107,108,.4),transparent 72%);
+  pointer-events:none;
 }
 .auth-card{
-  background:var(--card);border:1px solid var(--line);border-radius:14px;
-  padding:32px;width:100%;max-width:360px;
+  position:relative;background:var(--card);border-radius:22px;
+  padding:34px 32px;width:100%;max-width:380px;
+  box-shadow:0 30px 70px -20px rgba(5,10,25,.55);
 }
-.auth-card h2{font-size:22px;margin-bottom:4px;}
-.auth-sub{color:var(--ink-soft);font-size:13.5px;margin-bottom:20px;}
+.auth-brand{
+  display:flex;align-items:center;gap:9px;font-family:'Rethink Sans',sans-serif;
+  font-weight:700;font-size:15px;letter-spacing:-.01em;color:var(--ink-soft);margin-bottom:18px;
+}
+.auth-brand-dot{width:9px;height:9px;border-radius:50% 50% 50% 2px;background:var(--teal);flex:none;}
+.auth-card h2{font-size:25px;font-weight:800;letter-spacing:-.02em;margin-bottom:5px;}
+.auth-sub{color:var(--ink-soft);font-size:13.5px;line-height:1.5;margin-bottom:22px;}
 .auth-card input{
   width:100%;font-family:'Inter',sans-serif;font-size:14px;border:1.5px solid var(--line);
-  border-radius:8px;padding:10px 12px;background:var(--card);color:var(--ink);margin-bottom:10px;
+  border-radius:10px;padding:11px 13px;background:var(--card);color:var(--ink);margin-bottom:10px;transition:border-color .12s;
 }
-.auth-switch{font-size:13px;color:var(--ink-soft);margin-top:14px;text-align:center;}
+.auth-card input:focus{outline:none;border-color:var(--teal);}
+.auth-switch{font-size:13px;color:var(--ink-soft);margin-top:16px;text-align:center;}
 .auth-switch a{color:var(--teal);cursor:pointer;font-weight:600;}
 .auth-msg{font-size:13px;margin-top:10px;}
 .auth-msg.error{color:var(--red);}
@@ -221,9 +253,11 @@ textarea{min-height:180px;resize:vertical;line-height:1.55;}
 .logout-btn{
   font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);
   background:transparent;border:1px solid var(--line);border-radius:14px;
-  padding:4px 10px;cursor:pointer;margin-top:6px;
+  padding:4px 10px;cursor:pointer;margin-top:6px;transition:.15s;
 }
 .logout-btn:hover{border-color:var(--ink);color:var(--ink);}
+#authSubmit{background:var(--teal);box-shadow:0 14px 30px -14px rgba(10,102,194,.55);}
+#authSubmit:hover{background:#0958a8;}
 
 /* ---------- mobile ---------- */
 @media(max-width:600px){
@@ -254,6 +288,7 @@ textarea{min-height:180px;resize:vertical;line-height:1.55;}
 
 <div id="authOverlay" class="auth-overlay">
   <div class="auth-card">
+    <div class="auth-brand"><span class="auth-brand-dot"></span>DarAI</div>
     <h2 id="authTitle">Вход</h2>
     <div class="auth-sub" id="authSub">Войдите, чтобы синхронизировать прогресс между устройствами.</div>
     <input type="text" id="authUsername" class="hidden" placeholder="Имя для рейтинга (видно другим)" autocomplete="nickname">
@@ -339,9 +374,14 @@ textarea{min-height:180px;resize:vertical;line-height:1.55;}
       <span class="tag" id="lTag">LISTENING · beginner</span>
       <h3 id="lTitle">—</h3>
       <select id="lPick" style="margin-bottom:12px;"></select>
-      <div class="btn-row">
+      <audio id="lAudioPlayer" controls style="width:100%;display:none;margin-bottom:10px;"></audio>
+      <div class="btn-row" id="lTtsRow">
         <button class="btn secondary" onclick="speakScript()">🔊 Прослушать текст</button>
       </div>
+      <details id="lTapescript" style="display:none;margin-bottom:10px;">
+        <summary style="cursor:pointer;font-weight:600;color:var(--teal);">Показать текст записи (tapescript)</summary>
+        <div id="lTapescriptBody" style="white-space:pre-wrap;font-size:13px;color:var(--ink-soft);background:var(--paper);border-radius:8px;padding:12px 14px;margin-top:8px;"></div>
+      </details>
       <div id="lQuestions"></div>
       <div class="btn-row">
         <button class="btn" id="lSubmit" onclick="submitListening()">Проверить ответы</button>
@@ -565,6 +605,69 @@ const LISTENING_BANK = [
      {type:"gap",q:"Room number:",a:["212","two hundred and twelve","two twelve"]},
      {type:"gap",q:"Chapter to review:",a:["7","seven"]},
      {type:"gap",q:"Name of the group leader:",a:["daniel"]}
+   ]},
+  // Официальные записи (реальное аудио + tapescript) — загружено из "Новая папка"
+  {title:"Packham's Shipping Agency — Form Completion", qtype:"Form Completion", audio:"audio/listening/form-completion.mp3",
+   script:"You will hear a telephone conversation between a customer and an agent at a company which ships large boxes overseas.\n\nA  Good morning Packham's Shipping Agents. Can I help you?\nB  Oh yes, I'm ringing to make enquiries about sending a large box, a container, back home to Kenya from the UK.\nA  Yes, of course. Would you like me to try and find some quotations for you?\nB  Yes, that'd be great. Thank you.\nA  Well first of all, I need a few details from you.\nB  Fine.\nA  Can I take your name?\nB  It's Jacob Mkere.\nA  Can you spell your surname, please?\nB  Yes, it's M-K-E-R-E.\nA  Is that 'M' for mother?\nB  Yes.\nA  Thank you, and you say that you will be sending the box to Kenya?\nB  That's right.\nA  And where would you like the box picked up from?\nB  From college, if possible.\nA  Yes, of course. I'll take down the address now.\nB  It's Westall College.\nA  Is that W-E-S-T-A-L-L?\nB  Yes, ... college.\nA  Westall College. And where's that?\nB  It's Downlands Road, in Bristol.\nA  Oh yes, I know it. And the postcode?\nB  It's BS8 9PU.\nA  Right ... and I need to know the size.\nB  Yes, I've measured it carefully and it's 1.5m long ...\nA  Right.\nB  0.75m wide ...\nA  OK.\nB  And it's 0.5m high or deep.\nA  Great. So I'll calculate the volume in a moment and get some quotes for that. But first can you tell me, you know, very generally, what will be in the box?\nB  Yes there's mostly clothes.\nA  OK. [writing down]\nB  And there's some books.\nA  OK. Good. Um ... Anything else?\nB  Yes, there's also some toys.\nA  OK and what is the total value, do you think, of the contents?\nB  Well the main costs are the clothes and the books – they'll be about £1500 but then the toys are about another two hundred – so I'd put down £1700.",
+   qs:[
+     {type:"gap",q:"Surname of customer (Jacob ___):",a:["mkere"]},
+     {type:"gap",q:"Address to be collected from: ___ College, Downlands Rd:",a:["westall"]},
+     {type:"gap",q:"Postcode:",a:["bs8 9pu"]},
+     {type:"gap",q:"Width of container:",a:["0.75m","0.75 m","0.75","3/4 m","3/4m","three quarters of a metre","three-quarters of a metre","75cm","75 cm"]},
+     {type:"gap",q:"Height of container:",a:["0.5m","0.5 m","0.5","half a metre","half a meter","50cm","50 cm"]},
+     {type:"gap",q:"Contents (item 1 of 2 — clothes already given):",a:["books","toys"]},
+     {type:"gap",q:"Contents (item 2 of 2):",a:["toys","books"]},
+     {type:"gap",q:"Total estimated value: £___",a:["1700","1,700","£1700"]}
+   ]},
+  {title:"Shipping Insurance — Multiple Choice", qtype:"Multiple Choice", audio:"audio/listening/multiple-choice.mp3",
+   script:"(A customer has been arranging with a shipping agent to send a large box overseas. This is the last part of the conversation.)\n\nA  OK right. Now obviously insurance is an important thing to consider and our companies are able to offer very good rates in a number of different all-inclusive packages.\nB  Sorry, could you explain a bit more?\nA  Yes, sorry, um. There's really three rates according to quality of insurance cover – there's the highest comprehensive cover which is Premium rate, then there's standard rate and then there's economy rate. That one will only cover the cost of the contents second hand.\nB  Oh I've been stung before with economy insurance so I'll go for the highest.\nA  Mh'hm and can I just check would you want home delivery or to a local depot or would you want to pick it up at the nearest port?\nB  The port'd be fine – I've got transport that end.\nA  Fine and will you be paying by credit card?\nB  Can I pay by cheque?",
+   qs:[
+     {type:"mcq",q:"Type of insurance chosen",opts:["Economy","Standard","Premium"],a:2},
+     {type:"mcq",q:"Customer wants goods delivered to",opts:["port","home","depot"],a:0}
+   ]},
+  {title:"Life in the UK — Short-Answer Questions", qtype:"Short Answer", audio:"audio/listening/short-answer.mp3",
+   script:"You will hear an extract from a talk given to a group who are going to stay in the UK.\n\nGood evening, and welcome to the British Council. My name is John Parker and I've been asked to talk to you briefly about certain aspects of life in the UK before you actually go there. So I'm going to talk first about the best ways of making social contacts there. Now you might be wondering why it should be necessary. After all, we meet people all the time. But when you're living in a foreign country it can be more difficult, not just because of the language, but because customs may be different.\n\nIf you're going to work in the UK you will probably be living in private accommodation, so it won't be quite so easy to meet people. But there are still things that you can do to help yourself. First of all, you can get involved in activities in your local community, join a group of some kind. For example, you'll probably find that there are theatre groups who might be looking for actors, set designers and so on, or if you play an instrument you could join music groups in your area. Or if you like the idea of finding out about local history there'll be a group for that too. These are just examples. And the best places to get information about things like this are either the town hall or the public library. Libraries in the UK perform quite a broad range of functions nowadays – they're not just confined to lending books, although that's their main role of course.",
+   qs:[
+     {type:"gap",q:"What TWO factors can make social contact in a foreign country difficult? (1 of 2)",a:["language"]},
+     {type:"gap",q:"What TWO factors can make social contact in a foreign country difficult? (2 of 2)",a:["customs"]},
+     {type:"gap",q:"Community group example (already given: theatre) — name 1 more:",a:["music","music groups","local history","local history groups"]},
+     {type:"gap",q:"Community group example — name another:",a:["local history","local history groups","music","music groups"]},
+     {type:"gap",q:"Where can information about community activities be found? (1 of 2)",a:["library","libraries","the public library","public library"]},
+     {type:"gap",q:"Where can information about community activities be found? (2 of 2)",a:["town hall","the town hall"]}
+   ]},
+  {title:"Studying with the Open University — Sentence Completion", qtype:"Sentence Completion", audio:"audio/listening/sentence-completion.mp3",
+   script:"Two friends, Rachel and Paul, are discussing studying with the Open University. Rachel has already done a course at the university, but Paul has not.\n\nPaul     The other thing I wanted to ask you was, did you find it hard, studying with the Open University?\nRachel   You mean, because you're studying on your own, most of the time?\nPaul     Mm.\nRachel   Well it took me a while to get used to it. I found I needed to maintain a high level of motivation, because it's so different from school. There's no-one saying, 'Why haven't you written your assignment yet?' and that sort of thing.\nPaul     Oh dear.\nRachel   You'll learn it, Paul. Another thing was that I got very good at time-management because I had to fit time for studying round a full-time job.\nPaul     Well I'm hoping to change to working part-time, so that'll help.\nRachel   What makes it easier is that the degree is made up of modules, so you can take time off between them if you need to. It isn't like a traditional three-or four-year course, where you've got to do the whole thing of it in one go.\nPaul     That's good, because I'd like to spend six months travelling next year.\nRachel   Huh, it's all right for some. Then even though you're mostly studying at home, remember you've got tutors to help you, and from time to time there are summer schools. They usually last a week. They're great, because you meet all the other people struggling with the same things as you. I've made some really good friends that way.\nPaul     Sounds good. So how do I apply?",
+   qs:[
+     {type:"gap",q:"Studying with the Open University demanded a great deal of ___.",a:["motivation"]},
+     {type:"gap",q:"Studying and working at the same time improved Rachel's ___ skills.",a:["time management","time-management"]},
+     {type:"gap",q:"It was helpful that the course was structured in ___.",a:["modules"]},
+     {type:"gap",q:"She enjoyed meeting other students at ___.",a:["summer school","summer schools"]}
+   ]},
+  {title:"Understanding the World's Oceans — Robotic Float Project (Section 3)", qtype:"Notes + Letter Matching", audio:"audio/listening/section3-ocean-floats.mp3",
+   qs:[
+     {type:"gap",q:"Float is shaped like a ___",a:["cigar"]},
+     {type:"gap",q:"Scientists from ___ have worked on the project so far",a:["13 countries","13 different countries","thirteen countries","13"]},
+     {type:"gap",q:"Boat → Float dropped into ocean and ___ by satellite",a:["activated","is activated"]},
+     {type:"gap",q:"Average distance travelled:",a:["50 km","50km","50 kilometres","50 kilometers","about 50 km","around 50 km","approximately 50 km"]},
+     {type:"gap",q:"Float records changes in salinity and ___",a:["temperature","water temperature","ocean temperature","sea temperature","change in temperature","temperature changes"]},
+     {type:"mcq",q:"El Niño — At present (A), In the near future (B), or In the long-term future (C)?",opts:["A","B","C"],a:0},
+     {type:"mcq",q:"Global warming — At present (A), In the near future (B), or In the long-term future (C)?",opts:["A","B","C"],a:2},
+     {type:"mcq",q:"Naval rescues — At present (A), In the near future (B), or In the long-term future (C)?",opts:["A","B","C"],a:0},
+     {type:"mcq",q:"Sustainable fishing practices — At present (A), In the near future (B), or In the long-term future (C)?",opts:["A","B","C"],a:1},
+     {type:"mcq",q:"Crop selection — At present (A), In the near future (B), or In the long-term future (C)?",opts:["A","B","C"],a:2}
+   ]},
+  {title:"The National Arts Centre (Section 2)", qtype:"Notes + Table Completion", audio:"audio/listening/section2-arts-centre.mp3",
+   qs:[
+     {type:"gap",q:"Well known for:",a:["classical music","classical music concerts","classical concerts"]},
+     {type:"gap",q:"Complex also includes (besides concert rooms, theatres, cinemas, art galleries, public library, restaurants):",a:["bookshop","a bookshop","bookstore","a bookstore"]},
+     {type:"gap",q:"1960s – Centre was ___",a:["planned"]},
+     {type:"gap",q:"In ___ – opened to public",a:["1983","the 1980s","1980s"]},
+     {type:"gap",q:"Managed by:",a:["city council","the city council"]},
+     {type:"gap",q:"Open: ___ days per year",a:["363"]},
+     {type:"gap",q:"'The Magic Flute' (opera) venue:",a:["garden hall","the garden hall"]},
+     {type:"gap",q:"Wednesday 8pm film (Canadian film) title:",a:["three lives"]},
+     {type:"gap",q:"Wednesday film ticket price:",a:["£4.50","4.50","4.5","£4.5"]},
+     {type:"gap",q:"Weekend art exhibition title:",a:["faces of china"]}
    ]}
 ];
 
@@ -991,6 +1094,28 @@ function newListening(idx){
   document.getElementById('lQuestions').innerHTML = renderQBlock(currentListening.qs, 'l');
   document.getElementById('lResult').innerHTML = '';
   document.getElementById('lSubmit').disabled = false;
+  speechSynthesis.cancel();
+
+  const audioPlayer = document.getElementById('lAudioPlayer');
+  const ttsRow = document.getElementById('lTtsRow');
+  if(currentListening.audio){
+    audioPlayer.src = currentListening.audio;
+    audioPlayer.style.display = 'block';
+    ttsRow.style.display = 'none';
+  } else {
+    audioPlayer.removeAttribute('src');
+    audioPlayer.style.display = 'none';
+    ttsRow.style.display = 'flex';
+  }
+
+  const tapescript = document.getElementById('lTapescript');
+  if(currentListening.script){
+    document.getElementById('lTapescriptBody').textContent = currentListening.script;
+    tapescript.style.display = 'block';
+    tapescript.open = false;
+  } else {
+    tapescript.style.display = 'none';
+  }
 }
 function pickL(i,j){
   lAnswers[i]=j;
@@ -1341,7 +1466,7 @@ async function lookupWord(){
     const def = entry.meanings[0].definitions[0].definition || '';
     let html = `<div class="feedback-box" style="border-left-color:var(--teal);">
       <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;">
-        <span style="font-family:'Fraunces',serif;font-size:24px;font-weight:600;">${escapeHtml(entry.word)}</span>
+        <span style="font-family:'Rethink Sans',sans-serif;font-weight:800;font-size:24px;">${escapeHtml(entry.word)}</span>
         ${phonetic?`<span class="mono" style="color:var(--ink-soft);">${escapeHtml(phonetic)}</span>`:''}
         ${translation?`<span class="mono" style="color:var(--gold);font-weight:600;">${escapeHtml(translation)}</span>`:''}
         ${audio?`<button class="btn secondary" style="padding:4px 12px;font-size:12px;" onclick="new Audio('${audio}').play()">🔊</button>`:''}
@@ -1375,7 +1500,7 @@ async function translateWord(word){
   const already = (data.vocab||[]).some(v=>v.word===word);
   card.innerHTML = `<div class="feedback-box" style="border-left-color:var(--gold);">
     <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;">
-      <span style="font-family:'Fraunces',serif;font-size:20px;font-weight:600;">${escapeHtml(word)}</span>
+      <span style="font-family:'Rethink Sans',sans-serif;font-weight:800;font-size:20px;">${escapeHtml(word)}</span>
       ${translation?`<span class="mono" style="color:var(--gold);font-weight:600;">${escapeHtml(translation)}</span>`:'<span style="color:var(--ink-soft);font-size:12.5px;">перевод не найден</span>'}
       <button class="btn secondary" style="padding:3px 8px;font-size:11px;margin-left:auto;" onclick="document.getElementById('rWordCard').style.display='none'">✕</button>
     </div>
@@ -1436,7 +1561,7 @@ function renderReviewCard(){
   }
   const v = reviewQueue[reviewIdx];
   body.innerHTML = `
-    <div style="font-family:'Fraunces',serif;font-size:24px;font-weight:600;margin-bottom:10px;">${escapeHtml(v.word)}</div>
+    <div style="font-family:'Rethink Sans',sans-serif;font-weight:800;font-size:24px;margin-bottom:10px;">${escapeHtml(v.word)}</div>
     ${reviewRevealed
       ? `<p style="color:var(--gold);font-weight:600;font-size:16px;">${escapeHtml(v.tr||'перевод не сохранён')}</p>
          <p style="font-size:13px;color:var(--ink-soft);">${escapeHtml(v.def||'')}</p>
