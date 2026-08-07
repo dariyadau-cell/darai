@@ -249,6 +249,16 @@ textarea{min-height:180px;resize:vertical;line-height:1.55;}
 .auth-msg{font-size:13px;margin-top:10px;}
 .auth-msg.error{color:var(--red);}
 .auth-msg.ok{color:var(--teal);}
+.auth-google-btn{
+  width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
+  padding:11px 13px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);
+  font-family:'Inter',sans-serif;font-size:14px;font-weight:600;color:var(--ink);cursor:pointer;
+  margin-bottom:16px;transition:border-color .12s,background .12s;
+}
+.auth-google-btn:hover{border-color:var(--ink-soft);background:var(--paper);}
+.auth-google-btn:disabled{opacity:.6;cursor:default;}
+.auth-divider{display:flex;align-items:center;gap:10px;color:var(--ink-soft);font-size:12px;margin-bottom:16px;}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--line);}
 .hidden{display:none !important;}
 .logout-btn{
   font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);
@@ -291,6 +301,11 @@ textarea{min-height:180px;resize:vertical;line-height:1.55;}
     <div class="auth-brand"><span class="auth-brand-dot"></span>DarAI</div>
     <h2 id="authTitle">Вход</h2>
     <div class="auth-sub" id="authSub">Войдите, чтобы синхронизировать прогресс между устройствами.</div>
+    <button type="button" class="auth-google-btn" id="authGoogleBtn">
+      <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.9c1.7-1.57 2.7-3.88 2.7-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.26c-.81.54-1.85.86-3.06.86-2.35 0-4.34-1.59-5.05-3.72H.98v2.33A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.95 10.7A5.4 5.4 0 0 1 3.67 9c0-.59.1-1.16.28-1.7V4.96H.98A9 9 0 0 0 0 9c0 1.45.35 2.83.98 4.04l2.97-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0A9 9 0 0 0 .98 4.96l2.97 2.33C4.66 5.17 6.65 3.58 9 3.58z"/></svg>
+      Войти через Google
+    </button>
+    <div class="auth-divider">или email</div>
     <input type="text" id="authUsername" class="hidden" placeholder="Имя для рейтинга (видно другим)" autocomplete="nickname">
     <input type="email" id="authEmail" placeholder="Email" autocomplete="username">
     <input type="password" id="authPassword" placeholder="Пароль" autocomplete="current-password">
@@ -555,6 +570,22 @@ document.getElementById('authSubmit').addEventListener('click', async ()=>{
     msgEl.classList.add('error');
   }
   document.getElementById('authSubmit').disabled = false;
+});
+
+document.getElementById('authGoogleBtn').addEventListener('click', async ()=>{
+  const msgEl = document.getElementById('authMsg');
+  msgEl.className = 'auth-msg';
+  document.getElementById('authGoogleBtn').disabled = true;
+  const { error } = await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin + window.location.pathname }
+  });
+  if(error){
+    msgEl.textContent = error.message || 'Не удалось войти через Google.';
+    msgEl.classList.add('error');
+    document.getElementById('authGoogleBtn').disabled = false;
+  }
+  // при успехе браузер уходит на Google — сюда управление не возвращается
 });
 
 async function signOut(){
@@ -944,7 +975,8 @@ function escapeHtml(s){
 /* ---------- leaderboard ---------- */
 async function updateLeaderboardScore(overallBand, sessions){
   if(!currentUser) return;
-  const rawName = (currentUser.user_metadata && currentUser.user_metadata.username) || (currentUser.email||'').split('@')[0] || 'Аноним';
+  const meta = currentUser.user_metadata || {};
+  const rawName = meta.username || meta.full_name || meta.name || (currentUser.email||'').split('@')[0] || 'Аноним';
   const username = rawName.slice(0, 40);
   try{
     const { error } = await sb.from('leaderboard').upsert({
