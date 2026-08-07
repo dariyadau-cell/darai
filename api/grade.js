@@ -1,6 +1,8 @@
-// Vercel serverless function: proxies IELTS grading requests to Claude.
-// Keeps ANTHROPIC_API_KEY server-side only, and requires a valid Supabase
+// Vercel serverless function: proxies IELTS grading requests to DeepSeek.
+// Keeps DEEPSEEK_API_KEY server-side only, and requires a valid Supabase
 // session so the endpoint can't be called anonymously to burn API credits.
+// Response is wrapped to match the Anthropic Messages shape the frontend
+// already parses ({content:[{text}]}), so index.html needed no changes.
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -17,8 +19,8 @@ export default async function handler(req, res) {
 
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
-  const anthropicKey = process.env.ANTHROPIC_API_KEY;
-  if (!supabaseUrl || !supabaseAnonKey || !anthropicKey) {
+  const deepseekKey = process.env.DEEPSEEK_API_KEY;
+  if (!supabaseUrl || !supabaseAnonKey || !deepseekKey) {
     res.status(500).json({ error: 'Server not configured' });
     return;
   }
@@ -37,21 +39,28 @@ export default async function handler(req, res) {
     return;
   }
 
-  const anthropicRes = await fetch('https://api.anthropic.com/v1/messages', {
+  const dsRes = await fetch('https://api.deepseek.com/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-api-key': anthropicKey,
-      'anthropic-version': '2023-06-01',
+      Authorization: 'Bearer ' + deepseekKey,
     },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-6',
+      model: 'deepseek-chat',
       max_tokens: 1000,
-      system,
-      messages: [{ role: 'user', content: message }],
+      response_format: { type: 'json_object' },
+      messages: [
+        { role: 'system', content: system },
+        { role: 'user', content: message },
+      ],
     }),
   });
 
-  const json = await anthropicRes.json();
-  res.status(anthropicRes.status).json(json);
+  const json = await dsRes.json();
+  if (!dsRes.ok) {
+    res.status(dsRes.status).json({ error: (json.error && json.error.message) || 'DeepSeek request failed' });
+    return;
+  }
+  const text = (json.choices && json.choices[0] && json.choices[0].message && json.choices[0].message.content) || '';
+  res.status(200).json({ content: [{ text }] });
 }
